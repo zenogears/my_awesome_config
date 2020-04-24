@@ -800,7 +800,16 @@ function hotkeys:init(args)
 		{
 			{ env.mod }, "m", function(c) c.maximized = not c.maximized; c:raise() end,
 			{ description = "Maximize", group = "Client keys" }
-		}
+		},
+		{
+                        {}, "Print", function () awful.util.spawn("spectacle") end,
+                        { description = "Maximize", group = "Client keys" }
+                },
+		{
+                        { env.mod }, "Print", function() awful.util.spawn("spectacle -r") end,
+                        { description = "Maximize", group = "Client keys" }
+                }
+
 	}
 
 	self.keys.root = redflat.util.key.build(self.raw.root)
