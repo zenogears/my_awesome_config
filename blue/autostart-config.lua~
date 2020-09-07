@@ -26,7 +26,7 @@ function autostart.run()
 	--awful.spawn.with_shell("sleep 1 && bash ~/scripts/firefox/ff-sync.sh")
 
 	-- gnome environment
-	-- awful.spawn.with_shell("/lib/gsd-xsettings")
+	awful.spawn.with_shell("/lib/gsd-xsettings")
 	--awful.spawn.with_shell("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
 
 	-- keyboard layouts
@@ -42,7 +42,7 @@ function autostart.run()
         awful.spawn.with_shell("xset -dpms; xset s off")
 
 	awful.spawn.with_shell("deluge")
-        awful.spawn.with_shell("/home/zen/git/rto-proxy-x86_64.AppImage")
+        awful.spawn.with_shell("/home/zen/git/rto-proxy/rto-proxy-x86_64.AppImage")
 end
 
 -- Read and commads from file and spawn them
