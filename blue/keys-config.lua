@@ -6,6 +6,8 @@
 local table = table
 local awful = require("awful")
 local redflat = require("redflat")
+local vconfig = require("widgets/volume-control")
+local volumecfg = vconfig({})
 
 -- Initialize tables and vars for module
 -----------------------------------------------------------------------------------------------------------------------
@@ -23,6 +25,7 @@ local grid = redflat.layout.grid
 local map = redflat.layout.map
 local redtitle = redflat.titlebar
 local qlaunch = redflat.float.qlaunch
+
 
 -- Key support functions
 -----------------------------------------------------------------------------------------------------------------------
@@ -726,22 +729,22 @@ function hotkeys:init(args)
 		},
 
 		{
-			{}, "XF86AudioRaiseVolume", volume_raise,
+			{}, "XF86AudioRaiseVolume", function() volumecfg:up()  end,
 			{ description = "Increase volume", group = "Volume control" }
 		},
 		{
-			{}, "XF86AudioLowerVolume", volume_lower,
+			{}, "XF86AudioLowerVolume", function() volumecfg:down() end,
 			{ description = "Reduce volume", group = "Volume control" }
 		},
 		{
-			{ env.mod }, "v", volume_mute,
+			{}, "XF86AudioMute", function() volumecfg:toggle() end,
 			{ description = "Toggle mute", group = "Volume control" }
 		},
 
-		{
-			{ env.mod }, "e", function() redflat.float.player:show(rb_corner()) end,
-			{ description = "Show/hide widget", group = "Audio player" }
-		},
+--		{
+--			{ env.mod }, "e", function() redflat.float.player:show(rb_corner()) end,
+--			{ description = "Show/hide widget", group = "Audio player" }
+--		},
 --		{
 --			{}, "XF86AudioPlay", function() redflat.float.player:action("PlayPause") end,
 --			{ description = "Play/Pause track", group = "Audio player" }
@@ -754,6 +757,17 @@ function hotkeys:init(args)
 --			{}, "XF86AudioPrev", function() redflat.float.player:action("Previous") end,
 --			{ description = "Previous track", group = "Audio player" }
 --		},
+
+
+                {
+                       {         }, "#179", function () awful.spawn("xscreensaver-command --lock") end,
+                       { description = "screensaver", group = "Control" }
+                },
+
+                {
+                       { env.mod }, "#179", function () awful.spawn("systemctl suspend") end,
+                       { description = "screensaver", group = "Control" }
+                },
 
 		{
 			{ env.mod }, "y", function() laybox:toggle_menu(mouse.screen.selected_tag) end,
