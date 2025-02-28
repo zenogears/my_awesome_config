@@ -13,8 +13,8 @@ local autostart = {}
 --------------------------------------------------------------------------------
 function autostart.run()
 	-- utils
-        awful.spawn.with_shell("deadbeef")
-        awful.spawn.with_shell("numlockx on")
+        -- awful.spawn.with_shell("deadbeef")
+        -- awful.spawn.with_shell("numlockx on")
 
         awful.spawn.with_shell("thunderbird")
 
@@ -30,19 +30,19 @@ function autostart.run()
 	--awful.spawn.with_shell("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
 
 	-- keyboard layouts
-	-- awful.spawn.with_shell("setxkbmap -option -option 'grp:caps_toggle,grp:switch,grp_led:scroll,compose:menu' -layout 'us,ru'")
-	awful.spawn.with_shell("kbdd")
+	awful.spawn.with_shell("setxkbmap -option -option 'grp:caps_toggle,grp:switch,grp_led:caps,compose:menu' -layout 'us,ru'")
+	-- awful.spawn.with_shell("kbdd")
 	-- awful.spawn.with_shell("bash ~/scripts/env/kbdd-setup.sh")
 
 	-- apps
 	--awful.spawn.with_shell("clipflap")
 	--awful.spawn.with_shell("transmission-gtk -m")
         awful.spawn.with_shell("yakuake")
-        awful.spawn.with_shell("palemoon")
+        -- awful.spawn.with_shell("palemoon")
         awful.spawn.with_shell("xset -dpms; xset s off")
 
 	awful.spawn.with_shell("deluge")
-        awful.spawn.with_shell("/home/zen/git/rto-proxy-x86_64.AppImage")
+        -- awful.spawn.with_shell("/home/zen/git/rto-proxy-x86_64.AppImage")
 end
 
 -- Read and commads from file and spawn them

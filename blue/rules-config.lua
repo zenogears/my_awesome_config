@@ -77,10 +77,28 @@ function rules:init(args)
                 { rule = { class = "Navigator" },
                 properties = { tag = awful.screen.focused().tags[1] } },
 
+                { rule = { class = "krusader" },
+                properties = { tag = awful.screen.focused().tags[1] } },
+
                 { rule = { class = "Thunderbird" },
                 properties = { tag = awful.screen.focused().tags[2] } },
 
+                { rule = { class = "thunderbird" },
+                properties = { tag = awful.screen.focused().tags[2] } },
+
+                { rule = { class = "Mail" },
+                properties = { tag = awful.screen.focused().tags[2] } },
+
                 { rule = { class = "rto-proxy" },
+                properties = { tag = awful.screen.focused().tags[4] } },
+
+                { rule = { class = "TelegramDesktop" },
+                properties = { tag = awful.screen.focused().tags[3] } },
+
+                { rule = { class = "Deluge" },
+                properties = { tag = awful.screen.focused().tags[4] } },
+
+                { rule = { class = "Brave-browser" },
                 properties = { tag = awful.screen.focused().tags[4] } },
 
 

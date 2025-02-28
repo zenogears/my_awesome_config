@@ -40,7 +40,8 @@ theme.useless_gap         = 4  -- useless gap
 
 theme.cellnum = { x = 96, y = 58 } -- grid layout property
 
-theme.wallpaper = theme.path .. "/wallpaper/custom.png" -- wallpaper file
+-- theme.wallpaper = theme.path .. "/wallpaper/custom.png" -- wallpaper file
+theme.wallpaper = "/mnt/oldhome/zen/Изображения/02690-1273271716-girl with pistols.png"
 
 -- Fonts
 ------------------------------------------------------------

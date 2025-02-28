@@ -343,6 +343,8 @@ end
 n = require("naughty")
 --n.notify({preset=n.config.presets.normal, title="debug", text="value"})
 
+
+
 -- Using hddtemp
 ------------------------------------------------------------
 function system.thermal.hddtemp(args)
@@ -353,13 +355,13 @@ function system.thermal.hddtemp(args)
 	local output = redutil.read.output(
 		--"echo | curl --connect-timeout 1 -fsm 3 telnet://127.0.0.1:" .. port .. " | grep " .. disk
 		--"nc localhost -w 1 " .. port .. " |sed 's/|//m' | sed 's/||/ \n/g' | awk -F'|' '{print $1, $3, $4}'| grep" .. disk
-		"sudo /usr/sbin/hddtemp" .. disk
+                "/usr/sbin/hddtemp " .. disk
 	)
 	-- n.notify({preset=n.config.presets.normal, title="debug", text=output})
 	--local temp = string.match(output, "|(%d+)|[C]")
         local temp = string.match(output, "(%d+)°[C]")
 
-	--n.notify({preset=n.config.presets.normal, title="debug", text=temp})
+	-- n.notify({preset=n.config.presets.normal, title="debug", text=temp})
 	
 
 	return temp and { tonumber(temp) } or { 0 }

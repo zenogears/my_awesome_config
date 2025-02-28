@@ -47,7 +47,7 @@ function desktop:init(args)
 	local ssdspeed = { geometry = wgeometry(grid, places.ssdspeed, workarea) }
 
 	ssdspeed.args = {
-		interface = "sdd1",
+		interface = "sdd4",
 		meter_function = system.disk_speed,
 		timeout   = 2,
 		label     = "HOME"
@@ -62,7 +62,7 @@ function desktop:init(args)
 	local hddspeed = { geometry = wgeometry(grid, places.hddspeed, workarea) }
 
 	hddspeed.args = {
-		interface = "sda1",
+		interface = "sdd3",
 		meter_function = system.disk_speed,
 		timeout = 2,
 		label = "ROOT"
@@ -128,9 +128,9 @@ function desktop:init(args)
 
 	thermal.args = {
 		sensors = {
-			{ meter_function = system.thermal.sensors, args = "'thermistor'", maxm = 100, crit = 75 },
-			{ meter_function = system.thermal.hddtemp, args = { disk = "/dev/sda" }, maxm = 60, crit = 45 },
-                        { meter_function = system.thermal.hddtemp, args = { disk = "/dev/sdd" }, maxm = 60, crit = 45 },
+			{ meter_function = system.thermal.sensors, args = "'Intel PECI'", maxm = 100, crit = 75 },
+			{ meter_function = system.thermal.hddtemp, args = { disk = "/dev/sdd" }, maxm = 60, crit = 45 },
+                        { meter_function = system.thermal.hddtemp, args = { disk = "/dev/sdb" }, maxm = 60, crit = 45 },
 			--{ meter_function = system.thermal.nvoptimus, maxm = 105, crit = 80 }
 		},
 		names   = { "cpu", "root", "home" },

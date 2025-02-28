@@ -195,10 +195,10 @@ function hotkeys:init(args)
 			{ env.mod }, "j", redflat.menu.action.back,
 			{ description = "Go back", group = "Navigation" }
 		},
-		{
-			{ env.mod }, "l", redflat.menu.action.enter,
-			{ description = "Open submenu", group = "Navigation" }
-		},
+		--{
+		--	{ env.mod }, "l", redflat.menu.action.enter,
+		--	{ description = "Open submenu", group = "Navigation" }
+		--},
 	}
 
 	-- redflat.menu:set_keys(awful.util.table.join(redflat.menu.keys.move, menu_keys_move), "move")
@@ -336,10 +336,10 @@ function hotkeys:init(args)
 
 	-- shared layout keys
 	local layout_tile = {
-		{
-			{ env.mod }, "l", function () awful.tag.incmwfact( 0.05) end,
-			{ description = "Increase master width factor", group = "Layout" }
-		},
+		--{
+		--	{ env.mod }, "l", function () awful.tag.incmwfact( 0.05) end,
+		--	{ description = "Increase master width factor", group = "Layout" }
+		--},
 		{
 			{ env.mod }, "j", function () awful.tag.incmwfact(-0.05) end,
 			{ description = "Decrease master width factor", group = "Layout" }
@@ -614,10 +614,10 @@ function hotkeys:init(args)
 			{ description = "Clipboard manager", group = "Applications" }
 		},
 
-		{
-			{ env.mod }, "l", focus_switch_byd("right"),
-			{ description = "Go to right client", group = "Client focus" }
-		},
+		--{
+		--	{ env.mod }, "l", focus_switch_byd("right"),
+		--	{ description = "Go to right client", group = "Client focus" }
+		--},
 		{
 			{ env.mod }, "j", focus_switch_byd("left"),
 			{ description = "Go to left client", group = "Client focus" }
@@ -765,7 +765,7 @@ function hotkeys:init(args)
                 },
 
                 {
-                       { env.mod }, "#179", function () awful.spawn("systemctl suspend") end,
+                       { env.mod }, "l", function () awful.spawn("systemctl suspend") end,
                        { description = "screensaver", group = "Control" }
                 },
 
