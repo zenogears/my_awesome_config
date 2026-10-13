@@ -11,29 +11,33 @@ local autostart = {}
 
 -- Application list function
 --------------------------------------------------------------------------------
+-- every program starts only if it's installed, so the same list works on all machines
+local function run(cmd)
+	local prog = cmd:match("^(%S+)")
+	awful.spawn.with_shell(string.format("command -v %s >/dev/null && %s", prog, cmd))
+end
+
 function autostart.run()
 	-- utils
-	awful.spawn.with_shell("numlockx on")
-	awful.spawn.with_shell("xxkb")
-	awful.spawn.with_shell("nm-applet")
-	awful.spawn.with_shell("command -v copyq >/dev/null && copyq") -- clipboard manager, if installed
-	-- awful.spawn.with_shell("compton")
-	-- awful.spawn.with_shell("blueman-applet")
+	run("numlockx on")
+	run("xxkb")
+	run("nm-applet")
+	run("copyq") -- clipboard manager
+	-- run("blueman-applet")
 
 	-- keyboard layouts
-	awful.spawn.with_shell("setxkbmap -option -option 'grp:caps_toggle,grp:switch,grp_led:caps,compose:menu' -layout 'us,ru'")
+	run("setxkbmap -option -option 'grp:caps_toggle,grp:switch,grp_led:caps,compose:menu' -layout 'us,ru'")
 
-	-- KDE apps menu cache
-	awful.spawn.with_shell("kbuildsycoca6 --noincremental")
+	-- KDE apps menu cache (Plasma 6 / Plasma 5)
+	awful.spawn.with_shell("kbuildsycoca6 --noincremental 2>/dev/null || kbuildsycoca5 --noincremental 2>/dev/null")
 
 	-- apps
-	awful.spawn.with_shell("thunderbird")
-	awful.spawn.with_shell("yakuake")
-	awful.spawn.with_shell("krusader")
-	-- awful.spawn.with_shell("deadbeef")
-	-- awful.spawn.with_shell("palemoon")
-	-- awful.spawn.with_shell("deluge")
-	-- awful.spawn.with_shell("/home/zen/git/rto-proxy-x86_64.AppImage")
+	run("thunderbird")
+	run("yakuake")
+	run("krusader")
+	-- run("deadbeef")
+	-- run("palemoon")
+	-- run("deluge")
 end
 
 -- Read and commands from file and spawn them

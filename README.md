@@ -1,3 +1,44 @@
+# Blue (steel) — личная версия Red Flat config
+
+Форк [worron/awesome-config](https://github.com/worron/awesome-config) + свежий [redflat](https://github.com/worron/redflat) (вложен в репозиторий, без собственных правок).
+Используется только синяя тема: `rc.lua` → `color/blue/rc-blue.lua`, тема `themes/blue` → `themes/colored` → `themes/colorless`.
+
+## Ветки
+
+| ветка | машина | экран |
+|-------|--------|-------|
+| `home` | домашний ПК | 1280×1024 |
+| `work` | рабочий ПК, Kubuntu 24.04 | 1920×1080 |
+
+Отличия `work`: раскладка десктоп-виджетов под широкий экран и автоопределение железа
+(сеть, диски, датчики температуры) вместо прописанных вручную устройств домашнего ПК.
+Общие изменения делаются в `home` и вливаются в `work` (`git checkout work && git merge home`).
+
+## Установка
+
+```sh
+sudo apt install awesome lm-sensors pulseaudio-utils copyq numlockx   # awesome 4.3
+git clone -b <home|work> git@github.com:zenogears/my_awesome_config.git ~/.config/awesome
+~/.config/awesome/scripts/install-assets.sh   # шрифт Play и иконки ACYLS / ACYLS-steel в $HOME
+```
+
+Обои не хранятся в репозитории: положи картинку в `themes/blue/wallpaper/girl-with-pistols.png`
+(без неё будет однотонный фон). Сессия awesome выбирается в SDDM на экране входа.
+
+Проверка без выхода из сессии: `Xephyr :2 -screen 1920x1080 & DISPLAY=:2 awesome -c ~/.config/awesome/rc-devel.lua`
+(`rc-devel.lua` не запускает автозапуск).
+
+## Где что настраивается
+
+* `themes/blue/theme.lua` — палитра, шрифты, размеры всплывающих окон, уведомления, карточки и колонки десктоп-виджетов
+* `color/blue/desktop-config.lua` — какие десктоп-виджеты и что они показывают
+* `color/blue/keys-config.lua`, `appkeys-config.lua` — хоткеи и подсказки к ним (Mod4+F1, Mod4+Ctrl+F1)
+* `color/blue/rules-config.lua`, `alias-config.lua`, `autostart-config.lua`, `menu-config.lua`
+
+---
+
+# Original README
+
 # Red Flat Awesome WM config
 Custom config for [Awesome WM](http://awesome.naquadah.org).
 
