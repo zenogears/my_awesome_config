@@ -114,8 +114,16 @@ tray.buttons = awful.util.table.join(
 
 -- PA volume control
 --------------------------------------------------------------------------------
--- volume-control widget (pactl/amixer) from widgets/volume-control
-local volume = require("widgets.volume-control")({})
+local volume = {}
+volume.widget = redflat.widget.pulse(nil, { widget = redflat.gauge.audio.blue.new })
+
+volume.buttons = awful.util.table.join(
+	awful.button({}, 4, function() volume.widget:change_volume()                end),
+	awful.button({}, 5, function() volume.widget:change_volume({ down = true }) end),
+	awful.button({}, 2, function() volume.widget:mute()                         end),
+	awful.button({}, 1, function() volume.widget:mute()                         end),
+	awful.button({}, 3, function() awful.spawn("pavucontrol")                   end)
+)
 
 -- Keyboard layout indicator
 --------------------------------------------------------------------------------
@@ -255,7 +263,7 @@ awful.screen.connect_for_each_screen(
 				separator,
 				env.wrapper(sysmon.widget.cpuram, "cpuram", sysmon.buttons.cpuram),
 				separator,
-				env.wrapper(volume.widget, "volume"),
+				env.wrapper(volume.widget, "volume", volume.buttons),
 				separator,
 				env.wrapper(textclock.widget, "textclock"),
 				separator,
@@ -296,7 +304,7 @@ logout:init()
 local appkeys = require("color.blue.appkeys-config") -- load file with application keys sheet
 
 local hotkeys = require("color.blue.keys-config") -- load file with hotkeys configuration
-hotkeys:init({ env = env, menu = mymenu.mainmenu, appkeys = appkeys, volume = volume })
+hotkeys:init({ env = env, menu = mymenu.mainmenu, appkeys = appkeys, volume = volume.widget })
 
 
 -- Rules

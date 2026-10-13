@@ -131,10 +131,28 @@ function hotkeys:init(args)
 	))
 
 	-- volume functions
-	-- (volume is widgets/volume-control instance passed from rc-blue.lua)
-	local volume_raise = function() volume:up()     end
-	local volume_lower = function() volume:down()   end
-	local volume_mute  = function() volume:toggle() end
+	local volume_raise = function() volume:change_volume({ show_notify = true })              end
+	local volume_lower = function() volume:change_volume({ show_notify = true, down = true }) end
+	local volume_mute  = function() volume:mute() end
+
+	-- screen lock: first available locker wins
+	local lock_screen = function()
+		awful.spawn.easy_async_with_shell(
+			"if command -v i3lock >/dev/null; then i3lock -n -c 14171a;"
+			.. " elif command -v xsecurelock >/dev/null; then xsecurelock;"
+			.. " elif command -v xscreensaver-command >/dev/null; then xscreensaver-command --lock;"
+			.. " else echo NOLOCKER; fi",
+			function(out)
+				if out:find("NOLOCKER") then
+					require("naughty").notify({
+						preset = require("naughty").config.presets.critical,
+						title = "Нечем заблокировать экран",
+						text = "Установи блокировщик: sudo apt install i3lock",
+					})
+				end
+			end
+		)
+	end
 
 	-- Init widgets
 	redflat.float.qlaunch:init()
@@ -780,7 +798,7 @@ function hotkeys:init(args)
 
 		-- personal keys
 		{
-			{}, "#179", function() awful.spawn("xscreensaver-command --lock") end,
+			{}, "#179", lock_screen,
 			{ description = "Lock screen", group = "Control" }
 		},
 		{

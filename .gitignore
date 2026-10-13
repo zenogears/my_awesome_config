@@ -11,3 +11,5 @@ rc-back.lua
 
 # IDE settings
 .idea
+# files delivered by Claude app
+Claude outputs/

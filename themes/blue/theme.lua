@@ -54,6 +54,10 @@ theme.wallpaper    = "/mnt/oldhome/zen/Изображения/02690-1273271716-g
 theme:update()
 
 
+-- Icons: ACYLS copy recolored to the theme's steel-teal (~/.icons/ACYLS-steel)
+theme.service.dfparser.icons.theme = theme.homedir .. "/.icons/ACYLS-steel"
+
+
 -- Desktop config
 -----------------------------------------------------------------------------------------------------------------------
 
@@ -61,7 +65,7 @@ theme:update()
 --------------------------------------------------------------------------------
 theme.desktop.grid = {
 	width  = { 520, 520, 520 },
-	height = { 180, 160, 160, 138, 18 },
+	height = { 180, 160, 160, 210, 18, 18 },
 	edge   = { width = { 60, 60 }, height = { 40, 40 } }
 }
 
@@ -72,7 +76,8 @@ theme.desktop.places = {
 	cpumem   = { 1, 2 },
 	transm   = { 1, 3 },
 	disks    = { 1, 4 },
-	thermal  = { 1, 5 }
+	thermal  = { 1, 5 },
+	hddtherm = { 1, 6 },
 }
 
 -- Desktop widgets
@@ -113,8 +118,12 @@ theme.individual.desktop.multiline.disks = {
 
 -- Singleline temperature (individual widget)
 theme.individual.desktop.singleline.thermal = {
-	icon = theme.path .. "/desktop/star.svg",
-	unit = { { "°C", -1 } },
+	icon  = theme.path .. "/desktop/star.svg",
+	unit  = { { "°C", -1 } },
+	lbox  = { draw = "by_width", width = 50, color = "#8A949B" },
+	-- crimson accent: stars and overheated values echo the wing on the wallpaper
+	color = { main = theme.color.urgent, gray = "#8A949B", icon = "#8A949B",
+	          urgent = theme.color.urgent, wibox = theme.color.bg .. "00" },
 }
 
 
@@ -140,6 +149,12 @@ theme.widget.wrapper = {
 ------------------------------------------------------------
 theme.widget.tasklist.char_digit = 5
 theme.widget.tasklist.task = theme.gauge.task.blue
+
+-- crimson accent for the active tag (urgent apps on tags are shown in light color then)
+theme.gauge.tag.blue.color = {}
+for k, v in pairs(theme.color) do theme.gauge.tag.blue.color[k] = v end
+theme.gauge.tag.blue.color.main   = theme.color.urgent
+theme.gauge.tag.blue.color.urgent = theme.color.highlight
 
 -- Notifications (naughty)
 -----------------------------------------------------------------------------------------------------------------------

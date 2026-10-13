@@ -86,7 +86,7 @@ function menu:init(args)
 			{ "PaleMoon",      "palemoon",   micon("web-browser") },
 			{ "Krusader",      "krusader",   micon("system-file-manager"), key = "n" },
 			{ "Ranger",        ranger_comm,  micon("folder"), key = "r" },
-			{ "PyCharm",       "pycharm-community", micon("pycharm") },
+			{ "PyCharm",       "/home/zen/git/PyCharm/pycharm-2025.2.4/bin/pycharm", micon("pycharm") },
 			separator,
 			{ "Exit",          exitmenu,     micon("exit") },
 		}

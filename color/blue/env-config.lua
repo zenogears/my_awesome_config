@@ -50,7 +50,7 @@ function env:init(args)
 	naughty.config.spacing = 6
 
 	-- look up app icons (notify-send -i name) in ACYLS too, svg included
-	local acyls = os.getenv("HOME") .. "/.icons/ACYLS/scalable/"
+	local acyls = os.getenv("HOME") .. "/.icons/ACYLS-steel/scalable/"
 	naughty.config.icon_dirs = { acyls .. "apps/", acyls .. "status/", acyls .. "devices/", "/usr/share/pixmaps/" }
 	naughty.config.icon_formats = { "svg", "png", "gif" }
 

@@ -15,6 +15,7 @@ local desktop = {}
 local wgeometry = redflat.util.desktop.wgeometry
 local workarea = screen[mouse.screen].workarea
 local system = redflat.system
+local deluge = require("color.blue.deluge-meter")
 
 -- Desktop widgets
 -----------------------------------------------------------------------------------------------------------------------
@@ -83,14 +84,14 @@ function desktop:init(args)
 
 	cpumem.style = beautiful.individual.desktop.multimeter.cpumem
 
-	-- Transmission info
+	-- Torrents info (deluge)
 	--------------------------------------------------------------------------------
 	local transm = { geometry = wgeometry(grid, places.transm, workarea) }
 
 	transm.args = {
 		topbars    = { num = 8, maxm = 100 },
 		lines      = { { maxm = 6*1024 }, { maxm = 6*1024 } },
-		meter      = { async = system.transmission.info, args = { speed_only = true } },
+		meter      = { async = deluge.info, args = { speed_only = true } },
 		timeout    = 5,
 	}
 
@@ -106,6 +107,8 @@ function desktop:init(args)
 			{ meter_function = system.fs_info, maxm = 100, crit = 80, name = "home", args = "/home"        },
 			{ meter_function = system.fs_info, maxm = 100, crit = 80, name = "terra", args = "/mnt/terra" },
 			{ meter_function = system.fs_info, maxm = 100, crit = 80, name = "oldh", args = "/mnt/oldhome" },
+			{ meter_function = system.fs_info, maxm = 100, crit = 90, name = "play",  args = "/mnt/playstation" },
+			{ meter_function = system.fs_info, maxm = 100, crit = 90, name = "video", args = "/mnt/Video" },
 		},
 		timeout = 300
 	}
@@ -127,22 +130,33 @@ function desktop:init(args)
 	-- Temperature indicator
 	--------------------------------------------------------------------------------
 	local thermal = { geometry = wgeometry(grid, places.thermal, workarea) }
+	local hddtherm = { geometry = wgeometry(grid, places.hddtherm, workarea) }
 
 	-- hddtemp is setuid on this system, so it works without root
 	local hddtemp = function(disk)
 		return system.simple_async("/usr/sbin/hddtemp " .. disk, ":%s(%d+)[^%d]*C%s*$")
 	end
+	local gputemp = system.simple_async("nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader", "(%d+)")
 
 	thermal.args = {
 		sensors = {
-			{ meter_function = system.lmsensors.get, args = "cpu", maxm = 100, crit = 75, name = "cpu" },
-			{ async_function = hddtemp("/dev/sdb"), maxm = 60, crit = 45, name = "sdb" },
-			{ async_function = hddtemp("/dev/sdd"), maxm = 60, crit = 45, name = "sdd" },
+			{ meter_function = system.lmsensors.get, args = "cpu", maxm = 100, crit = 80, name = "cpu" },
+			{ async_function = gputemp, maxm = 100, crit = 80, name = "gpu" },
+			{ async_function = hddtemp("/dev/sde"), maxm = 70, crit = 60, name = "ssd" },
 		},
 		timeout = sensors_base_timeout,
 	}
 
-	thermal.style = beautiful.individual.desktop.singleline.thermal
+	hddtherm.args = {
+		sensors = {
+			{ async_function = hddtemp("/dev/sdb"), maxm = 65, crit = 55, name = "play" },
+			{ async_function = hddtemp("/dev/sdd"), maxm = 65, crit = 55, name = "vid" },
+		},
+		timeout = 30,
+	}
+
+	thermal.style  = beautiful.individual.desktop.singleline.thermal
+	hddtherm.style = beautiful.individual.desktop.singleline.thermal
 
 
 	-- Initialize all desktop widgets
@@ -151,14 +165,14 @@ function desktop:init(args)
 	ssdspeed.body = redflat.desktop.speedmeter.normal(ssdspeed.args, ssdspeed.style)
 	hddspeed.body = redflat.desktop.speedmeter.normal(hddspeed.args, hddspeed.style)
 	cpumem.body   = redflat.desktop.multimeter(cpumem.args, cpumem.style)
-	-- transmission widget disabled: deluge is used, the old widget showed stub data only
-	-- transm.body   = redflat.desktop.multimeter(transm.args, transm.style)
+	transm.body   = redflat.desktop.multimeter(transm.args, transm.style)
 	disks.body    = redflat.desktop.multiline(disks.args, disks.style)
 	thermal.body  = redflat.desktop.singleline(thermal.args, thermal.style)
+	hddtherm.body = redflat.desktop.singleline(hddtherm.args, hddtherm.style)
 
 	-- Desktop setup
 	--------------------------------------------------------------------------------
-	local desktop_objects = { netspeed, hddspeed, ssdspeed, cpumem, disks, thermal }
+	local desktop_objects = { netspeed, hddspeed, ssdspeed, transm, cpumem, disks, thermal, hddtherm }
 
 	if not autohide then
 		redflat.util.desktop.build.static(desktop_objects)
