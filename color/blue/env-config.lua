@@ -47,10 +47,22 @@ function env:init(args)
 	-- naughty config
 	naughty.config.padding = beautiful.useless_gap and 2 * beautiful.useless_gap or 0
 
+	naughty.config.spacing = 6
+
+	-- look up app icons (notify-send -i name) in ACYLS too, svg included
+	local acyls = os.getenv("HOME") .. "/.icons/ACYLS/scalable/"
+	naughty.config.icon_dirs = { acyls .. "apps/", acyls .. "status/", acyls .. "devices/", "/usr/share/pixmaps/" }
+	naughty.config.icon_formats = { "svg", "png", "gif" }
+
+	-- Presets are updated in place: naughty.dbus keeps references to the original
+	-- preset tables, so replacing them would leave notify-send/app notifications unstyled
 	if beautiful.naughty then
-		naughty.config.presets.normal   = redflat.util.table.merge(beautiful.naughty.base, beautiful.naughty.normal)
-		naughty.config.presets.critical = redflat.util.table.merge(beautiful.naughty.base, beautiful.naughty.critical)
-		naughty.config.presets.low      = redflat.util.table.merge(beautiful.naughty.base, beautiful.naughty.low)
+		for _, name in ipairs({ "low", "normal", "critical" }) do
+			local preset = naughty.config.presets[name]
+			for _, src in ipairs({ beautiful.naughty.base, beautiful.naughty[name] }) do
+				for k, v in pairs(src or {}) do preset[k] = v end
+			end
+		end
 	end
 end
 

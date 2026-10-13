@@ -141,6 +141,42 @@ theme.widget.wrapper = {
 theme.widget.tasklist.char_digit = 5
 theme.widget.tasklist.task = theme.gauge.task.blue
 
+-- Notifications (naughty)
+-----------------------------------------------------------------------------------------------------------------------
+-- fixed width so long text wraps instead of stretching across the screen, height is auto
+local notify_shape = function(cr, w, h) require("gears").shape.rounded_rect(cr, w, h, 4) end
+
+theme.naughty = {}
+
+theme.naughty.base = {
+	position     = "bottom_right",
+	timeout      = 10,
+	margin       = 14,
+	width        = 440,
+	max_height   = 320,
+	icon_size    = 48,
+	font         = theme.fonts.main,
+	bg           = theme.color.wibox,
+	fg           = theme.color.text,
+	border_width = 2,
+	border_color = theme.color.main,
+	shape        = notify_shape,
+}
+
+theme.naughty.normal = {}
+
+theme.naughty.low = {
+	timeout      = 5,
+	fg           = theme.color.icon,
+	border_color = theme.color.border,
+}
+
+theme.naughty.critical = {
+	timeout      = 0,
+	fg           = theme.color.highlight,
+	border_color = theme.color.urgent,
+}
+
 -- End
 -----------------------------------------------------------------------------------------------------------------------
 return theme
