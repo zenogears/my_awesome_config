@@ -1,8 +1,7 @@
 -----------------------------------------------------------------------------------------------------------------------
 --                                        RedFlat brightness control widget                                          --
 -----------------------------------------------------------------------------------------------------------------------
--- Brightness control using xbacklight
--- or using gnome/unity settings daemon
+-- Brightness control using xbacklight or other tools
 -----------------------------------------------------------------------------------------------------------------------
 
 -- Grab environment
@@ -16,89 +15,84 @@ local redutil = require("redflat.util")
 
 -- Initialize tables and vars for module
 -----------------------------------------------------------------------------------------------------------------------
-local brightness = { dbus_correction = 1 }
+local brightness = {}
 
-local defaults = { down = false, step = 2 }
+-- brightness control tools
+brightness.variants = {}
 
-local gsd_set = "SetPercentage uint32:%d"
-local gsd_get = "GetPercentage"
-local gsd_command = 'dbus-send --session --print-reply --dest="org.gnome.SettingsDaemon" '
-                    .. '/org/gnome/SettingsDaemon/Power '
-                    .. 'org.gnome.SettingsDaemon.Power.Screen.'
+brightness.variants.xbacklight = {
+	increase = "xbacklight -inc %s", -- command to increase brightness
+	decrease = "xbacklight -dec %s", -- command to decrease brightness
+	update = "xbacklight -get", -- command to get current brightness (use only if increase/decrease doesn't return it)
+}
 
--- Generate default theme vars
+--brightness.variants.script = {
+--	increase = "~/.config/awesome/scripts/brightness.py --inc=%s",
+--	decrease = "~/.config/awesome/scripts/brightness.py --dec=%s",
+--}
+
+-- Generate default theme and other settings
 -----------------------------------------------------------------------------------------------------------------------
 local function default_style()
 	local style = {
 		notify = {},
 	}
-	return redutil.table.merge(style, redutil.table.check(beautiful, "widget.brightness") or {})
+	return redutil.table.merge(style, redutil.table.check(beautiful, "float.brightness") or {})
 end
+
+local default_args = { down = false, step = 2 }
+brightness.default_variant = brightness.variants.xbacklight
+
 
 -- Change brightness level
 -----------------------------------------------------------------------------------------------------------------------
 
--- Change with xbacklight
+-- Parse command output and show brightness notification by result
+------------------------------------------------------------
+function brightness._notify_from_output(output)
+	if not brightness.style then brightness.style = default_style() end
+
+	rednotify:show(redutil.table.merge(
+		{ value = output / 100, text = string.format('%.0f', output) .. "%" },
+		brightness.style.notify
+	))
+end
+
+-- Change brightness
+------------------------------------------------------------
+function brightness:change(args, variant)
+	args = redutil.table.merge(default_args, args or {})
+	variant = variant or brightness.default_variant
+
+	local command_pattern = args.down and variant.decrease or variant.increase
+	local command = string.format(command_pattern, args.step)
+
+	local handler = self:build_change_handler(variant)
+	awful.spawn.easy_async_with_shell(command, handler)
+end
+
+-- Build brightness change callback function depending on brightness tool
+------------------------------------------------------------
+function brightness:build_change_handler(variant)
+	if variant.update then
+		return function() self:notify_from_command(variant.update) end
+	else
+		return self._notify_from_output
+	end
+end
+
+-- Show current brightness
+------------------------------------------------------------
+function brightness:notify_from_command(command)
+	awful.spawn.easy_async(command, self._notify_from_output)
+end
+
+-- DEPRECATED! Change brightness with xbacklight tool
 ------------------------------------------------------------
 function brightness:change_with_xbacklight(args)
-	local args = redutil.table.merge(defaults, args or {})
-
-	if args.down then
-		awful.spawn.easy_async("xbacklight -dec " .. args.step, self.info_with_xbacklight)
-	else
-		awful.spawn.easy_async("xbacklight -inc " .. args.step, self.info_with_xbacklight)
-	end
+	self:change(args, self.variants.xbacklight)
 end
 
--- Change with dbus-send and gnome/unity settings daemon
-------------------------------------------------------------
-function brightness:change_with_gsd(args)
-	local args = redutil.table.merge(defaults, args or {})
-
-	-- correction because of strange dbus output rounding
-	local dbus_output = redutil.read.output(gsd_command .. gsd_get)
-	local brightness_level = string.match(dbus_output, "uint32%s(%d+)") + self.dbus_correction
-
-	-- increase/decrease
-	brightness_level = args.down and (brightness_level - args.step) or (brightness_level + args.step)
-
-	-- 1 .. 99 only because of correction bug
-	if     brightness_level > 99 then brightness_level = 99
-	elseif brightness_level < 1  then brightness_level = 1
-	end
-
-	-- set and show
-	awful.spawn.with_shell(gsd_command .. string.format(gsd_set, brightness_level))
-	self.info_with_gsd(brightness_level)
-end
-
--- Update brightness level info
------------------------------------------------------------------------------------------------------------------------
-
--- Update from xbacklight
-------------------------------------------------------------
-function brightness.info_with_xbacklight()
-	if not brightness.style then brightness.style = default_style() end
-	local brightness_level = redutil.read.output("xbacklight -get")
-
-	rednotify:show(redutil.table.merge(
-		{ value = brightness_level / 100, text = string.format('%.0f', brightness_level) .. "%" },
-		brightness.style.notify
-	))
-end
-
--- Update from dbus-send and gnome/unity settings daemon
-------------------------------------------------------------
-function brightness.info_with_gsd(level)
-	if not brightness.style then brightness.style = default_style() end
-
-	local brightness_level = level or string.match(redutil.read.output(gsd_command .. gsd_get), "uint32%s(%d+)")
-
-	rednotify:show(redutil.table.merge(
-		{ value = brightness_level / 100, text = brightness_level .. "%" },
-		brightness.style.notify
-	))
-end
-
+-- End
 -----------------------------------------------------------------------------------------------------------------------
 return brightness

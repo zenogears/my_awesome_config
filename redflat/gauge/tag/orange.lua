@@ -29,10 +29,11 @@ local function default_style()
 		radius       = 14,
 		iradius      = 6,
 		cgap         = TPI / 20,
-		hilight_min  = true,
+		show_min     = true,
 		min_sections = 1,
-		color        = { main   = "#b1222b", gray = "#575757", icon = "#a0a0a0", urgent = "#32882d",
-		                 wibox = "#202020", empty = "#575757"}
+		text         = false,
+		font         = { font = "Sans", size = 16, face = 0, slant = 0 },
+		color        = { main  = "#b1222b", gray  = "#575757", icon = "#a0a0a0", urgent = "#32882d" }
 	}
 
 	return redutil.table.merge(style, redutil.table.check(beautiful, "gauge.tag.orange") or {})
@@ -45,10 +46,11 @@ function orangetag.new(style)
 
 	-- Initialize vars
 	--------------------------------------------------------------------------------
-	local style = redutil.table.merge(default_style(), style or {})
+	style = redutil.table.merge(default_style(), style or {})
 
 	-- updating values
 	local data = {
+		state = { text = "TEXT" },
 		width = style.width or nil
 	}
 
@@ -60,12 +62,12 @@ function orangetag.new(style)
 	------------------------------------------------------------
 	function widg:set_state(state)
 		data.state = state
-		self:emit_signal("widget::updated")
+		self:emit_signal("widget::redraw_needed")
 	end
 
 	function widg:set_width(width)
 		data.width = width
-		self:emit_signal("widget::updated")
+		self:emit_signal("widget::redraw_needed")
 	end
 
 	-- Fit
@@ -90,8 +92,18 @@ function orangetag.new(style)
 		cl = data.state.active and style.color.main or (data.state.occupied and  style.color.icon or style.color.gray)
 		cr:set_source(color(cl))
 
-		cr:arc(width / 2, height / 2, style.iradius, 0, TPI)
-		cr:fill()
+		if style.text then
+			-- text
+			redutil.cairo.set_font(cr, style.font)
+			local ext = cr:text_extents(tostring(#data.state.list))
+			cr:move_to((width - ext.width - ext.x_bearing) / 2, (height + ext.height + ext.x_bearing) / 2)
+			cr:show_text(data.state.text)
+			cr:stroke()
+		else
+			-- round
+			cr:arc(width / 2, height / 2, style.iradius, 0, TPI)
+			cr:fill()
+		end
 
 		-- occupied mark
 		cr:set_line_width(style.line_width)
@@ -101,9 +113,9 @@ function orangetag.new(style)
 			if data.state.list[i] then
 				cl = data.state.list[i].focus and style.color.main or
 				     data.state.list[i].urgent and style.color.urgent or
- 				     data.state.list[i].minimized and style.hilight_min and style.color.gray or style.color.icon
+				     data.state.list[i].minimized and style.show_min and style.color.gray or style.color.icon
 			else
-				cl = style.color.empty
+				cl = style.color.gray
 			end
 
 			cr:set_source(color(cl))

@@ -7,7 +7,7 @@
 
 -- Grab environment
 -----------------------------------------------------------------------------------------------------------------------
-local unpack = unpack
+local unpack = unpack or table.unpack
 local beautiful = require("beautiful")
 local wibox = require("wibox")
 local timer = require("gears.timer")
@@ -15,11 +15,10 @@ local timer = require("gears.timer")
 local redutil = require("redflat.util")
 local svgbox = require("redflat.gauge.svgbox")
 local progressbar = require("redflat.gauge.graph.bar")
-local rectshape = require("gears.shape").rectangle
 
 -- Initialize tables for module
 -----------------------------------------------------------------------------------------------------------------------
-local notify = {}
+local notify = { last = {} }
 
 -- Generate default theme vars
 -----------------------------------------------------------------------------------------------------------------------
@@ -37,7 +36,7 @@ local function default_style()
 		icon            = nil,
 		progressbar     = {},
 		color           = { border = "#575757", icon = "#aaaaaa", wibox = "#202020" },
-		shape           = rectshape
+		shape           = nil
 	}
 	return redutil.table.merge(style, redutil.table.check(beautiful, "float.notify") or {})
 end
@@ -83,7 +82,7 @@ function notify:init()
 	-- Set info function
 	--------------------------------------------------------------------------------
 	function self:set(args)
-		local args = args or {}
+		args = args or {}
 		align_vertical:reset()
 
 		if args.value then
@@ -100,7 +99,7 @@ function notify:init()
 		end
 
 		image:set_image(args.icon ~= nil and args.icon or style.icon)
-		image:set_color(style.color.icon)
+		image:set_color(args.color or style.color.icon)
 	end
 
 	-- Set autohide timer
@@ -125,14 +124,17 @@ end
 function notify:show(args)
 	if not self.wibox then self:init() end
 	self:set(args)
+	args = args or {}
+	local target_screen = args.screen or mouse.screen
+	local set_position = args.set_position or self.style.set_position or nil
 
-	-- TODO: add placement update if active screen changed
-	if not self.wibox.visible then
-		if self.style.set_position then self.wibox:geometry(self.style.set_position()) end
-		redutil.placement.no_offscreen(self.wibox, self.style.screen_gap, mouse.screen.workarea)
+	if not self.wibox.visible or target_screen.index ~= self.last.screen then
+		if set_position then set_position(self.wibox) end
+		redutil.placement.no_offscreen(self.wibox, self.style.screen_gap, target_screen.workarea)
 		self.wibox.visible = true
 	end
 
+	self.last.screen = target_screen.index
 	self.hidetimer:again()
 end
 

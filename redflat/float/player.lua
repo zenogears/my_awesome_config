@@ -8,19 +8,19 @@
 
 -- Grab environment
 -----------------------------------------------------------------------------------------------------------------------
-local unpack = unpack
+local unpack = unpack or table.unpack
 local math = math
 
 local awful = require("awful")
 local beautiful = require("beautiful")
 local wibox = require("wibox")
 local timer = require("gears.timer")
+local gstring = require("gears.string")
 
 local redutil = require("redflat.util")
 local progressbar = require("redflat.gauge.graph.bar")
 local dashcontrol = require("redflat.gauge.graph.dash")
 local svgbox = require("redflat.gauge.svgbox")
-local rectshape = require("gears.shape").rectangle
 
 -- Initialize and vars for module
 -----------------------------------------------------------------------------------------------------------------------
@@ -44,36 +44,73 @@ local dbus_set = dbus_mpris
 local dbus_action = dbus_mpris
                     .. "org.mpris.MediaPlayer2.Player."
 
+-- Hotfix for https://github.com/awesomeWM/awesome/issues/2985
+-----------------------------------------------------------------------------------------------------------------------
+local function mouse_get_current_widget_geometry()
+	local w = mouse.current_wibox
+	if w then
+		local geo, coords = w:geometry(), mouse:coords()
+		local bw = w.border_width
+
+		local list = w:find_widgets(coords.x - geo.x - bw, coords.y - geo.y - bw)
+
+		-- return the geometry of the topmost widget
+		return list[#list]
+	end
+end
+
 -- Helper function to decode URI string format
 -----------------------------------------------------------------------------------------------------------------------
 local function decodeURI(s)
 	return string.gsub(s, '%%(%x%x)', function(hex) return string.char(tonumber(hex, 16)) end)
 end
 
+-- Dbus output parser
+-----------------------------------------------------------------------------------------------------------------------
+local function parse_dbus_value(output, ident)
+	local regex = "(" .. ident .. ")%s+([a-z0-9]+)%s+(.-)%s-%)\n"
+	local _, _, value = output:match(regex)
+	if not value then return nil end
+
+	-- check for int64 type field
+	local int64_val = value:match("int64%s+(%d+)")
+	if int64_val then return tonumber(int64_val) end
+
+	-- check for double type field
+	local double_val = value:match("double%s+([%d.]+)")
+	if double_val then return tonumber(double_val) end
+
+	-- check for array type field as table, extract first entry only
+	local array_val = value:match("array%s%[%s+([^%],]+)")
+	if array_val then return { array_val } end
+
+	return value
+end
+
 -- Generate default theme vars
 -----------------------------------------------------------------------------------------------------------------------
 local function default_style()
 	local style = {
-		geometry       = { width = 520, height = 150 },
-		screen_gap     = 0,
-		screen_pos     = nil,
-		dashcontrol    = {},
-		progressbar    = {},
-		border_gap     = { 20, 20, 20, 20 },
-		elements_gap   = { 20, 0, 0, 0 },
-		volume_gap     = { 0, 0, 0, 3 },
-		control_gap    = { 0, 0, 18, 8 },
-		buttons_margin = { 0, 0, 3, 3 },
-		pause_gap      = { 12, 12 },
-		timeout        = 5,
-		line_height    = 26,
-		bar_width      = 8, -- progress bar height
-		volume_width   = 50,
-		titlefont      = "Sans 12",
-		timefont       = "Sans 12",
-		artistfont     = "Sans 12",
-		border_width   = 2,
-		icon           = {
+		geometry        = { width = 520, height = 150 },
+		screen_gap      = 0,
+		set_position    = nil,
+		dashcontrol     = {},
+		progressbar     = {},
+		border_margin   = { 20, 20, 20, 20 },
+		elements_margin = { 20, 0, 0, 0 },
+		volume_margin   = { 0, 0, 0, 3 },
+		controls_margin = { 0, 0, 18, 8 },
+		buttons_margin  = { 0, 0, 3, 3 },
+		pause_margin    = { 12, 12, 0, 0 },
+		timeout         = 5,
+		line_height     = 26,
+		bar_width       = 8, -- progress bar height
+		volume_width    = 50,
+		titlefont       = "Sans 12",
+		timefont        = "Sans 12",
+		artistfont      = "Sans 12",
+		border_width    = 2,
+		icon            = {
 			cover   = redutil.base.placeholder(),
 			play    = redutil.base.placeholder({ txt = "►" }),
 			pause   = redutil.base.placeholder({ txt = "[]" }),
@@ -82,7 +119,7 @@ local function default_style()
 		},
 		color          = { border = "#575757", main = "#b1222b",
 		                   wibox = "#202020", gray = "#575757", icon = "#a0a0a0" },
-		shape          = rectshape
+		shape          = nil
 	}
 	return redutil.table.merge(style, redutil.table.check(beautiful, "float.player") or {})
 end
@@ -94,23 +131,26 @@ function player:init(args)
 
 	-- Initialize vars
 	--------------------------------------------------------------------------------
-	local args = args or {}
+	args = args or {}
 	local _player = args.name or "vlc"
 	local style = default_style()
 	local show_album = false
 
 	self.info = { artist = "Unknown", album = "Unknown" }
 	self.style = style
-	self.last = { status = "Stopped", length = 5 * 60 * 1000000, volume = nil }
+	self.last = { status = "Stopped", length = 5 * 60 * 1000000, volume = nil, trackid = "/not/used" }
+	self.player = _player
+	self.use_track_id_hack = args.use_track_id_hack or false
 
 	-- dbus vars
 	self.command = {
 		get_all      = string.format(dbus_getall, _player),
+		get_meta     = string.format(dbus_get, _player, "string:'Metadata'"),
 		get_position = string.format(dbus_get, _player, "string:'Position'"),
 		get_volume   = string.format(dbus_get, _player, "string:'Volume'"),
 		set_volume   = string.format(dbus_set, _player, "string:'Volume' variant:double:"),
 		action       = string.format(dbus_action, _player),
-		set_position = string.format(dbus_action, _player) .. "SetPosition objpath:/not/used int64:",
+		set_position = string.format(dbus_action, _player) .. "SetPosition objpath:%s int64:%s",
 	}
 
 	self._actions = { "PlayPause", "Next", "Previous" }
@@ -145,7 +185,7 @@ function player:init(args)
 	player_buttons:add(prev_button)
 
 	self.play_button = svgbox(style.icon.play, nil, style.color.icon)
-	player_buttons:add(wibox.container.margin(self.play_button, unpack(style.pause_gap)))
+	player_buttons:add(wibox.container.margin(self.play_button, unpack(style.pause_margin)))
 
 	local next_button = svgbox(style.icon.next_tr, nil, style.color.icon)
 	player_buttons:add(next_button)
@@ -156,7 +196,7 @@ function player:init(args)
 
 	-- volume
 	self.volume = dashcontrol(style.dashcontrol)
-	local volumespace = wibox.container.margin(self.volume, unpack(style.volume_gap))
+	local volumespace = wibox.container.margin(self.volume, unpack(style.volume_margin))
 	local volume_area = wibox.container.constraint(volumespace, "exact", style.volume_width, nil)
 
 	-- full line
@@ -173,11 +213,13 @@ function player:init(args)
 	------------------------------------------------------------
 	local align_vertical = wibox.layout.align.vertical()
 	align_vertical:set_top(text_area)
-	align_vertical:set_middle(wibox.container.margin(control_align, unpack(style.control_gap)))
+	align_vertical:set_middle(wibox.container.margin(control_align, unpack(style.controls_margin)))
 	align_vertical:set_bottom(wibox.container.constraint(self.bar, "exact", nil, style.bar_width))
 	local area = wibox.layout.fixed.horizontal()
-	area:add(self.box.image)
-	area:add(wibox.container.margin(align_vertical, unpack(style.elements_gap)))
+	local cover_area = wibox.container.place(self.box.image)
+	cover_area.forced_width = style.geometry.height - style.border_margin[3] - style.border_margin[4]
+	area:add(cover_area)
+	area:add(wibox.container.margin(align_vertical, unpack(style.elements_margin)))
 
 	-- Buttons
 	------------------------------------------------------------
@@ -198,13 +240,15 @@ function player:init(args)
 		awful.button(
 			{}, 1, function()
 				local coords = {
-					bar   = mouse.current_widget_geometry,
+					bar   = mouse_get_current_widget_geometry(),
 					wibox = mouse.current_wibox:geometry(),
 					mouse = mouse.coords(),
 				}
 
 				local position = (coords.mouse.x - coords.wibox.x - coords.bar.x) / coords.bar.width
-				awful.spawn.with_shell(self.command.set_position .. math.floor(self.last.length * position))
+				local cmd = string.format(self.command.set_position, self.last.trackid,
+				                          math.floor(self.last.length * position))
+				awful.spawn.with_shell(cmd)
 			end
 		)
 	))
@@ -229,7 +273,7 @@ function player:init(args)
 		shape        = style.shape
 	})
 
-	self.wibox:set_widget(wibox.container.margin(area, unpack(style.border_gap)))
+	self.wibox:set_widget(wibox.container.margin(area, unpack(style.border_margin)))
 	self.wibox:geometry(style.geometry)
 
 	-- Update info functions
@@ -245,9 +289,11 @@ function player:init(args)
 	------------------------------------------------------------
 	self.update_artist = function()
 		if show_album then
-			self.box.artist:set_markup('<span color="' .. style.color.gray .. '">From </span>' .. self.info.album)
+			self.box.artist:set_markup('<span color="' .. style.color.gray .. '">From </span>'
+			                           .. gstring.xml_escape(self.info.album))
 		else
-			self.box.artist:set_markup('<span color="' .. style.color.gray .. '">By </span>' .. self.info.artist)
+			self.box.artist:set_markup('<span color="' .. style.color.gray .. '">By </span>'
+			                           .. gstring.xml_escape(self.info.artist))
 		end
 	end
 
@@ -256,6 +302,7 @@ function player:init(args)
 	self.clear_info = function(is_att)
 		self.box.image:set_image(style.icon.cover)
 		self.box.image:set_color(is_att and style.color.main or style.color.gray)
+		self.box.image:emit_signal("widget::layout_changed")
 
 		self.box.time:set_text("0:00")
 		self.bar:set_value(0)
@@ -264,6 +311,7 @@ function player:init(args)
 		self.update_artist()
 
 		self.last.volume = nil
+		self.last.trackid = "/not/used"
 	end
 
 	-- Main update function
@@ -316,37 +364,32 @@ function player:initialize_info()
 
 			local data = { Metadata = {} }
 
-			local function parse_dbus_value(ident)
-				local regex = "(" .. ident .. ")%s+([a-z0-9]+)%s+(.-)%s-%)\n"
-				local _, _, value = output:match(regex)
-				if not value then return nil end
-
-				-- check for int64 type field
-				local int64_val = value:match("int64%s+(%d+)")
-				if int64_val then return tonumber(int64_val) end
-
-				-- check for double type field
-				local double_val = value:match("double%s+([%d.]+)")
-				if double_val then return tonumber(double_val) end
-
-				-- check for array type field as table, extract first entry only
-				local array_val = value:match("array%s%[%s+([^%],]+)")
-				if array_val then return { array_val } end
-
-				return value
-			end
-
 			if exit_code == 0 then
-				data.Metadata["xesam:title"]  = parse_dbus_value("xesam:title")
-				data.Metadata["xesam:artist"] = parse_dbus_value("xesam:artist")
-				data.Metadata["xesam:album"]  = parse_dbus_value("xesam:album")
-				data.Metadata["mpris:artUrl"] = parse_dbus_value("mpris:artUrl")
-				data.Metadata["mpris:length"] = parse_dbus_value("mpris:length")
-				data["Volume"]                = parse_dbus_value("Volume")
-				data["Position"]              = parse_dbus_value("Position")
-				data["PlaybackStatus"]        = parse_dbus_value("PlaybackStatus")
+				data.Metadata["xesam:title"]    = parse_dbus_value(output, "xesam:title")
+				data.Metadata["xesam:artist"]   = parse_dbus_value(output, "xesam:artist")
+				data.Metadata["xesam:album"]    = parse_dbus_value(output, "xesam:album")
+				data.Metadata["mpris:trackid"]  = parse_dbus_value(output, "mpris:trackid")
+				data.Metadata["mpris:artUrl"]   = parse_dbus_value(output, "mpris:artUrl")
+				data.Metadata["mpris:length"]   = parse_dbus_value(output, "mpris:length")
+				data["Volume"]                  = parse_dbus_value(output, "Volume")
+				data["Position"]                = parse_dbus_value(output, "Position")
+				data["PlaybackStatus"]          = parse_dbus_value(output, "PlaybackStatus")
 				self:update_from_metadata(data)
 			end
+		end
+	)
+end
+
+-- Force update track data
+-----------------------------------------------------------------------------------------------------------------------
+function player:_fill_track_id(data)
+	awful.spawn.easy_async(
+		self.command.get_meta,
+		function(output, _, _, exit_code)
+			if exit_code == 0 then
+				data.Metadata["mpris:trackid"]  = parse_dbus_value(output, "mpris:trackid")
+			end
+			self:update_from_metadata(data)
 		end
 	)
 end
@@ -390,7 +433,7 @@ function player:show(geometry)
 		if geometry then
 			self.wibox:geometry(geometry)
 		elseif self.style.set_position then
-			self.wibox:geometry(self.style.set_position())
+			self.style.set_position(self.wibox)
 		else
 			awful.placement.under_mouse(self.wibox)
 		end
@@ -427,16 +470,23 @@ function player:update_from_metadata(data)
 			if image then
 				self.box.image:set_color(nil)
 				has_cover = self.box.image:set_image(decodeURI(image))
+				self.box.image:emit_signal("widget::layout_changed")
 			end
 		end
 		if not has_cover then
 			-- reset to generic icon if no cover available
 			self.box.image:set_color(self.style.color.gray)
 			self.box.image:set_image(self.style.icon.cover)
+			self.box.image:emit_signal("widget::layout_changed")
 		end
 
 		-- track length
 		if data.Metadata["mpris:length"] then self.last.length = data.Metadata["mpris:length"] end
+
+		-- track id
+		if data.Metadata["mpris:trackid"] then
+			self.last.trackid = data.Metadata["mpris:trackid"]
+		end
 	end
 
 	if data.PlaybackStatus then
@@ -491,11 +541,18 @@ function player:listen()
 	dbus.request_name("session", "org.freedesktop.DBus.Properties")
 	dbus.add_match(
 		"session",
-		"path=/org/mpris/MediaPlayer2, interface='org.freedesktop.DBus.Properties', member='PropertiesChanged'"
+		"sender='org.mpris.MediaPlayer2." .. self.player .. "', interface='org.freedesktop.DBus.Properties', "
+		.. "member='PropertiesChanged'"
 	)
 	dbus.connect_signal("org.freedesktop.DBus.Properties",
 		function (_, _, data)
-			self:update_from_metadata(data)
+			if not data then return end
+
+			if self.use_track_id_hack and data.Metadata and not data.Metadata["mpris:trackid"] then
+				self:_fill_track_id(data)
+			else
+				self:update_from_metadata(data)
+			end
 		end
 	)
 
