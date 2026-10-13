@@ -149,7 +149,7 @@ local notify_shape = function(cr, w, h) require("gears").shape.rounded_rect(cr, 
 theme.naughty = {}
 
 theme.naughty.base = {
-	position     = "bottom_right",
+	position     = "top_right",
 	timeout      = 10,
 	margin       = 14,
 	width        = 440,
