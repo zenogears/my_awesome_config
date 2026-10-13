@@ -14,12 +14,14 @@ local autostart = {}
 function autostart.run()
 	-- utils
         -- awful.spawn.with_shell("deadbeef")
-        -- awful.spawn.with_shell("numlockx on")
-
+        awful.spawn.with_shell("numlockx on")
         awful.spawn.with_shell("thunderbird")
+	awful.spawn.with_shell("xxkb")
 
 	-- awful.spawn.with_shell("compton")
 	awful.spawn.with_shell("nm-applet")
+        -- awful.spawn.with_shell("blueman-applet")
+
 	--awful.spawn.with_shell("bash ~/scripts/env/pa-setup.sh")
 	--awful.spawn.with_shell("bash ~/scripts/env/color-profile-setup.sh")
 
@@ -38,10 +40,13 @@ function autostart.run()
 	--awful.spawn.with_shell("clipflap")
 	--awful.spawn.with_shell("transmission-gtk -m")
         awful.spawn.with_shell("yakuake")
+        awful.spawn.with_shell("krusader")
+
         -- awful.spawn.with_shell("palemoon")
         awful.spawn.with_shell("xset -dpms; xset s off")
+        awful.spawn.with_shell("kbuildsycoca6 --noincremental")
 
-	awful.spawn.with_shell("deluge")
+	-- awful.spawn.with_shell("deluge")
         -- awful.spawn.with_shell("/home/zen/git/rto-proxy-x86_64.AppImage")
 end
 

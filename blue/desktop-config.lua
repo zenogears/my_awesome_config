@@ -47,7 +47,7 @@ function desktop:init(args)
 	local ssdspeed = { geometry = wgeometry(grid, places.ssdspeed, workarea) }
 
 	ssdspeed.args = {
-		interface = "sdd4",
+		interface = "sdb4",
 		meter_function = system.disk_speed,
 		timeout   = 2,
 		label     = "HOME"
@@ -62,7 +62,7 @@ function desktop:init(args)
 	local hddspeed = { geometry = wgeometry(grid, places.hddspeed, workarea) }
 
 	hddspeed.args = {
-		interface = "sdd3",
+		interface = "sdb3",
 		meter_function = system.disk_speed,
 		timeout = 2,
 		label = "ROOT"
@@ -93,8 +93,9 @@ function desktop:init(args)
 		lines      = { { maxm = 6*1024, unit = { { "SEED", - 1 } } }, { maxm = 6*1024, unit = { { "DNLD", - 1 } } } },
 		meter      = { func = system.transmission_parse },
 		timeout    = 1,
-		--async      = "transmission-remote -l"
-                async      = "cat /home/zen/transmission"
+		-- async      = "transmission-remote -l"
+                -- async      = "cat /home/zen/transmission"
+                async      = "12"
 	}
 
 	transm.style = {
@@ -128,7 +129,7 @@ function desktop:init(args)
 
 	thermal.args = {
 		sensors = {
-			{ meter_function = system.thermal.sensors, args = "'Intel PECI'", maxm = 100, crit = 75 },
+			{ meter_function = system.thermal.sensors, args = "'AMD AMDSI'", maxm = 100, crit = 75 },
 			{ meter_function = system.thermal.hddtemp, args = { disk = "/dev/sdd" }, maxm = 60, crit = 45 },
                         { meter_function = system.thermal.hddtemp, args = { disk = "/dev/sdb" }, maxm = 60, crit = 45 },
 			--{ meter_function = system.thermal.nvoptimus, maxm = 105, crit = 80 }

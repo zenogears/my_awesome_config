@@ -442,43 +442,45 @@ function system.transmission_parse(output)
 	--local status_pos = string.find(output, "Status")
 
 	-- assuming "Up & Down" and "Downloading" is the same thing
-	output = string.gsub(output,"Up & Down","Downloading")
+	-- output = string.gsub(output,"Up & Down","Downloading")
 
 	-- parse every line
-	for line in string.gmatch(output, "[^\n]+") do
-		if string.sub(line, 1, 3) == "Sum" then
-			-- get total speed
-			local seed, dnld = string.match(line, "Sum:%s+[%d%.]+%s+%a+%s+([%d%.]+)%s+([%d%.]+)")
-			if seed and dnld then
-				torrent.seed.speed, torrent.dnld.speed = seed, dnld
-			end
-		else
-			-- get torrent info
-			local prog, status = string.match(line,
-				"%s+%d+%s+(%d+)%%%s+[%d%.]+%s%a+%s+.+%s+[%d%.]+%s+[%d%.]+%s+[%d%.]+%s+(%a+)"
-			)
-			if prog and status then
-				table.insert(torrent.list, { prog = prog, status = status })
+	-- for line in string.gmatch(output, "[^\n]+") do
+	--	if string.sub(line, 1, 3) == "Sum" then
+	--		-- get total speed
+	--		local seed, dnld = string.match(line, "Sum:%s+[%d%.]+%s+%a+%s+([%d%.]+)%s+([%d%.]+)")
+	--		if seed and dnld then
+	--			torrent.seed.speed, torrent.dnld.speed = seed, dnld
+	--		end
+	--	else
+	--		-- get torrent info
+	--		local prog, status = string.match(line,
+	--			"%s+%d+%s+(%d+)%%%s+[%d%.]+%s%a+%s+.+%s+[%d%.]+%s+[%d%.]+%s+[%d%.]+%s+(%a+)"
+	--		)
+	--		if prog and status then
+	--			table.insert(torrent.list, { prog = prog, status = status })
 
-				if     status == "Seeding"     then torrent.seed.num = torrent.seed.num + 1
-				elseif status == "Downloading" then torrent.dnld.num = torrent.dnld.num + 1
-				end
-			end
-		end
-	end
+	--			if     status == "Seeding"     then torrent.seed.num = torrent.seed.num + 1
+	--			elseif status == "Downloading" then torrent.dnld.num = torrent.dnld.num + 1
+	--			end
+	--		end
+	--	end
+	--end
 
 	-- Sort torrents
 	------------------------------------------------------------
-	table.sort(torrent.list, sort_torrent)
+	--table.sort(torrent.list, sort_torrent)
 
 	-- Format output special for redflat desktop widget
 	------------------------------------------------------------
+        torrent.list = "[1,{'prog': 'Deluge', 'status': 'true'}]"
 	local sorted_prog = {}
 	for _, t in ipairs(torrent.list) do table.insert(sorted_prog , t.prog) end
 
 	return {
 		corners = sorted_prog,
-		lines = { { torrent.seed.speed, torrent.seed.num }, { torrent.dnld.speed, torrent.dnld.num } },
+		--lines = { { torrent.seed.speed, torrent.seed.num }, { torrent.dnld.speed, torrent.dnld.num } },
+		lines = { {1,2}, {3,4} },
 		alert = false
 	}
 end

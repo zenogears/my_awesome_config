@@ -80,6 +80,9 @@ function rules:init(args)
                 { rule = { class = "krusader" },
                 properties = { tag = awful.screen.focused().tags[1] } },
 
+                { rule = { class = "Krusader" },
+                properties = { tag = awful.screen.focused().tags[1] } },
+
                 { rule = { class = "Thunderbird" },
                 properties = { tag = awful.screen.focused().tags[2] } },
 
