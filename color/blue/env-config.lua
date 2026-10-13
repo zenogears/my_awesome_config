@@ -74,7 +74,8 @@ end
 env.wallpaper = function(s)
 	if beautiful.wallpaper then
 		if not env.desktop_autohide and awful.util.file_readable(beautiful.wallpaper) then
-			gears.wallpaper.maximized(beautiful.wallpaper, s, true)
+			-- keep aspect: 5:4 picture on a 16:9 screen is cropped, offset (in picture pixels) picks the visible part
+			gears.wallpaper.maximized(beautiful.wallpaper, s, false, beautiful.wallpaper_offset)
 		else
 			gears.wallpaper.set(beautiful.color and beautiful.color.bg)
 		end

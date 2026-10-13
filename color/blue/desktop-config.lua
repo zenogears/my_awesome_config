@@ -16,6 +16,7 @@ local desktop = {}
 local workarea = screen[mouse.screen].workarea
 local system = redflat.system
 local deluge = require("color.blue.deluge-meter")
+local hw = require("color.blue.hwdetect")
 
 -- Desktop widgets
 -----------------------------------------------------------------------------------------------------------------------
@@ -26,6 +27,12 @@ function desktop:init(args)
 	local env = args.env or {}
 	local autohide = env.desktop_autohide or false
 
+	-- hardware of this machine (see color/blue/hwdetect.lua)
+	local root_dev = hw.device_of("/")
+	local home_dev = hw.device_of("/home")
+	local home_label = "HOME"
+	if home_dev == root_dev then home_dev, home_label = hw.parent_disk(root_dev), "DISK" end
+
 	-- placement: cards stacked in two columns (see theme.desktop.columns / theme.desktop.card)
 	local card = beautiful.desktop.card
 	local cols = beautiful.desktop.columns
@@ -35,7 +42,7 @@ function desktop:init(args)
 	local netspeed = {}
 
 	netspeed.args = {
-		interface    = "enp3s0",
+		interface    = hw.net_iface(),
 		maxspeed     = { up = 6*1024^2, down = 6*1024^2 },
 		crit         = { up = 6*1024^2, down = 6*1024^2 },
 		timeout      = 2,
@@ -49,10 +56,10 @@ function desktop:init(args)
 	local ssdspeed = {}
 
 	ssdspeed.args = {
-		interface = "sde4",
+		interface = home_dev,
 		meter_function = system.disk_speed,
 		timeout   = 2,
-		label     = "HOME"
+		label     = home_label
 	}
 
 	ssdspeed.style = beautiful.individual.desktop.speedmeter.drive
@@ -62,7 +69,7 @@ function desktop:init(args)
 	local hddspeed = {}
 
 	hddspeed.args = {
-		interface = "sde3",
+		interface = root_dev,
 		meter_function = system.disk_speed,
 		timeout = 2,
 		label = "ROOT"
@@ -102,58 +109,25 @@ function desktop:init(args)
 	local disks = {}
 
 	disks.args = {
-		sensors  = {
-			{ meter_function = system.fs_info, maxm = 100, crit = 80, name = "root", args = "/"            },
-			{ meter_function = system.fs_info, maxm = 100, crit = 80, name = "home", args = "/home"        },
-			{ meter_function = system.fs_info, maxm = 100, crit = 80, name = "terra", args = "/mnt/terra" },
-			{ meter_function = system.fs_info, maxm = 100, crit = 80, name = "oldh", args = "/mnt/oldhome" },
-			{ meter_function = system.fs_info, maxm = 100, crit = 90, name = "play",  args = "/mnt/playstation" },
-			{ meter_function = system.fs_info, maxm = 100, crit = 90, name = "video", args = "/mnt/Video" },
-		},
+		sensors  = {},
 		timeout = 300
 	}
 
+	for _, m in ipairs(hw.mounts(6)) do
+		table.insert(disks.args.sensors, { meter_function = system.fs_info, maxm = 100, crit = 90, name = m[2], args = m[1] })
+	end
+
 	disks.style = beautiful.individual.desktop.multiline.disks
 
-	-- Sensors parser setup
-	--------------------------------------------------------------------------------`
-	local sensors_base_timeout = 5
-
-	system.lmsensors.delay = 2
-	system.lmsensors.patterns = {
-		cpu       = { match = "%+(%d+)%.%d[^\n]-AMD AMDSI" },
-	}
-
-	-- start auto async lmsensors check
-	system.lmsensors:soft_start(sensors_base_timeout)
-
-	-- Temperature indicator
+	-- Temperature indicators: whatever lm-sensors / nvidia-smi report on this machine, 3 per row
 	--------------------------------------------------------------------------------
-	local thermal = {}
-	local hddtherm = {}
+	local temps = hw.temperatures()
+	local thermal, hddtherm = {}, {}
+	local row1, row2 = {}, {}
+	for k, t in ipairs(temps) do table.insert(k <= 3 and row1 or row2, t) end
 
-	-- hddtemp is setuid on this system, so it works without root
-	local hddtemp = function(disk)
-		return system.simple_async("/usr/sbin/hddtemp " .. disk, ":%s(%d+)[^%d]*C%s*$")
-	end
-	local gputemp = system.simple_async("nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader", "(%d+)")
-
-	thermal.args = {
-		sensors = {
-			{ meter_function = system.lmsensors.get, args = "cpu", maxm = 100, crit = 80, name = "cpu" },
-			{ async_function = gputemp, maxm = 100, crit = 80, name = "gpu" },
-			{ async_function = hddtemp("/dev/sde"), maxm = 70, crit = 60, name = "ssd" },
-		},
-		timeout = sensors_base_timeout,
-	}
-
-	hddtherm.args = {
-		sensors = {
-			{ async_function = hddtemp("/dev/sdb"), maxm = 65, crit = 55, name = "play" },
-			{ async_function = hddtemp("/dev/sdd"), maxm = 65, crit = 55, name = "vid" },
-		},
-		timeout = 30,
-	}
+	thermal.args  = { sensors = row1, timeout = 5 }
+	hddtherm.args = { sensors = row2, timeout = 10 }
 
 	thermal.style  = beautiful.individual.desktop.singleline.thermal
 	hddtherm.style = beautiful.individual.desktop.singleline.thermal
@@ -167,12 +141,15 @@ function desktop:init(args)
 	cpumem.body   = redflat.desktop.multimeter(cpumem.args, cpumem.style)
 	transm.body   = redflat.desktop.multimeter(transm.args, transm.style)
 	disks.body    = redflat.desktop.multiline(disks.args, disks.style)
-	thermal.body  = redflat.desktop.singleline(thermal.args, thermal.style)
-	hddtherm.body = redflat.desktop.singleline(hddtherm.args, hddtherm.style)
+	if #row1 > 0 then thermal.body  = redflat.desktop.singleline(thermal.args, thermal.style) end
+	if #row2 > 0 then hddtherm.body = redflat.desktop.singleline(hddtherm.args, hddtherm.style) end
 
 	-- Desktop setup
 	--------------------------------------------------------------------------------
-	local desktop_objects = { netspeed, hddspeed, ssdspeed, transm, cpumem, disks, thermal, hddtherm }
+	local desktop_objects = {}
+	for _, o in ipairs({ netspeed, hddspeed, ssdspeed, transm, cpumem, disks, thermal, hddtherm }) do
+		if o.body then table.insert(desktop_objects, o) end
+	end
 
 	if not autohide then
 		local byname = {
@@ -189,16 +166,24 @@ function desktop:init(args)
 				local inner = wibox.layout.fixed.vertical()
 				inner.spacing = card.spacing
 				local h = 0
-				for k, item in ipairs(items) do
+				local count = 0
+				for _, item in ipairs(items) do
 					local obj = byname[item[1]]
-					inner:add(wibox.container.constraint(obj.body.area, "exact", cols.width, item[2]))
-					h = h + item[2] + (k > 1 and card.spacing or 0)
+					if obj and obj.body then
+						-- disks card grows with the number of detected filesystems
+						local ih = item[1] == "disks" and math.ceil(item[2] * #disks.args.sensors / 6) or item[2]
+						inner:add(wibox.container.constraint(obj.body.area, "exact", cols.width, ih))
+						h = h + ih + (count > 0 and card.spacing or 0)
+						count = count + 1
+					end
 				end
 
-				local box = wibox({ type = "desktop", visible = true, bg = card.bg })
-				box:geometry({ x = x, y = y, width = cw, height = h + 2 * pad })
-				box:set_widget(wibox.container.margin(inner, pad, pad, pad, pad))
-				y = y + h + 2 * pad + cols.gap
+				if count > 0 then
+					local box = wibox({ type = "desktop", visible = true, bg = card.bg })
+					box:geometry({ x = x, y = y, width = cw, height = h + 2 * pad })
+					box:set_widget(wibox.container.margin(inner, pad, pad, pad, pad))
+					y = y + h + 2 * pad + cols.gap
+				end
 			end
 		end
 	else

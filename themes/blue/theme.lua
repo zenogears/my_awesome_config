@@ -46,22 +46,23 @@ theme.useless_gap  = 6  -- useless gap
 
 -- Hotkeys helper fonts: compact enough for two columns on a 1280px wide screen
 -- (Iosevka Term isn't installed here, so keys use a local monospace)
-theme.fonts.hotkeys.main  = "Roboto 12"
-theme.fonts.hotkeys.key   = "Ubuntu Sans Mono 12"
-theme.fonts.hotkeys.title = "Roboto bold 13"
+theme.fonts.hotkeys.main  = "Roboto 13"
+theme.fonts.hotkeys.key   = "Ubuntu Sans Mono 13"
+theme.fonts.hotkeys.title = "Roboto bold 14"
 -- local copy: /mnt/oldhome may be not mounted at login (original: /mnt/oldhome/zen/Изображения/02690-...girl with pistols.png)
 theme.wallpaper    = theme.path .. "/wallpaper/girl-with-pistols.png"
+theme.wallpaper_offset = { x = 0, y = -100 } -- 1280x1024 picture on 1920x1080: keep the head, crop the floor
 
 -- Setup parent theme settings
 --------------------------------------------------------------------------------
 theme:update()
 
 
--- Popups sized for a 1280x1024 screen (upstream values are for 1920+ wide screens)
-theme.float.hotkeys.geometry = { width = 1220 }
-theme.float.hotkeys.heights  = { key = 21, title = 25 }
+-- Popups sized for a 1920x1080 screen
+theme.float.hotkeys.geometry = { width = 1500 }
+theme.float.hotkeys.heights  = { key = 23, title = 27 }
 theme.float.keychain.keytip  = { geometry = { width = 1100 }, column = 2 }
-theme.float.qlaunch.geometry = { width = 1220, height = 170 }
+theme.float.qlaunch.geometry = { width = 1400, height = 170 }
 theme.service.navigator.keytip["grid"]    = { geometry = { width = 1100 }, column = 2, exit = true }
 theme.service.navigator.keytip["usermap"] = { geometry = { width = 1100 }, column = 2, exit = true }
 
@@ -74,7 +75,7 @@ theme.service.dfparser.icons.theme = theme.homedir .. "/.icons/ACYLS-steel"
 
 -- Desktop widgets placement
 --------------------------------------------------------------------------------
--- Desktop layout tuned for 1280x1024 (see color/blue/desktop-config.lua).
+-- Desktop layout tuned for 1920x1080, work PC (see color/blue/desktop-config.lua).
 -- Widgets live on translucent dark "cards" so they read well on any part of the wallpaper.
 -- Two columns: the left one grows from the left edge, the right one from the right edge,
 -- the middle stays free for the wallpaper art. Every card is a list of { widget name, height }.
@@ -85,9 +86,9 @@ theme.desktop.card = {
 }
 
 theme.desktop.columns = {
-	edge  = { x = 24, y = 24 }, -- screen edge to card edge
-	gap   = 14,                 -- space between cards
-	width = 440,                -- widget width (card is wider by 2 * padding)
+	edge  = { x = 36, y = 30 }, -- screen edge to card edge
+	gap   = 16,                 -- space between cards
+	width = 520,                -- widget width (card is wider by 2 * padding)
 	left  = {
 		{ { "cpumem", 150 } },
 		{ { "transm", 150 } },
@@ -95,9 +96,9 @@ theme.desktop.columns = {
 		{ { "thermal", 18 }, { "hddtherm", 18 } },
 	},
 	right = {
-		{ { "netspeed", 168 } },
-		{ { "ssdspeed", 168 } },
-		{ { "hddspeed", 168 } },
+		{ { "netspeed", 176 } },
+		{ { "ssdspeed", 176 } },
+		{ { "hddspeed", 176 } },
 	},
 }
 
