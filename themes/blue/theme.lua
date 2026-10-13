@@ -121,8 +121,8 @@ theme.individual.desktop.singleline.thermal = {
 	icon  = theme.path .. "/desktop/star.svg",
 	unit  = { { "°C", -1 } },
 	lbox  = { draw = "by_width", width = 50, color = "#8A949B" },
-	-- crimson accent: stars and overheated values echo the wing on the wallpaper
-	color = { main = theme.color.urgent, gray = "#8A949B", icon = "#8A949B",
+	-- lighter label/value gray so text reads on the dark part of the wallpaper
+	color = { main = theme.color.main, gray = "#8A949B", icon = "#8A949B",
 	          urgent = theme.color.urgent, wibox = theme.color.bg .. "00" },
 }
 
@@ -150,11 +150,6 @@ theme.widget.wrapper = {
 theme.widget.tasklist.char_digit = 5
 theme.widget.tasklist.task = theme.gauge.task.blue
 
--- crimson accent for the active tag (urgent apps on tags are shown in light color then)
-theme.gauge.tag.blue.color = {}
-for k, v in pairs(theme.color) do theme.gauge.tag.blue.color[k] = v end
-theme.gauge.tag.blue.color.main   = theme.color.urgent
-theme.gauge.tag.blue.color.urgent = theme.color.highlight
 
 -- Notifications (naughty)
 -----------------------------------------------------------------------------------------------------------------------
