@@ -102,17 +102,6 @@ local function client_numkey(i, mod, action)
 	)
 end
 
--- brightness functions
-local brightness = function(args)
-	redflat.float.brightness:change_with_xbacklight(args) -- use xbacklight
-end
-
--- right bottom corner position
-local rb_corner = function()
-	return { x = screen[mouse.screen].workarea.x + screen[mouse.screen].workarea.width,
-	         y = screen[mouse.screen].workarea.y + screen[mouse.screen].workarea.height }
-end
-
 -- Build hotkeys depended on config parameters
 -----------------------------------------------------------------------------------------------------------------------
 function hotkeys:init(args)
@@ -135,24 +124,14 @@ function hotkeys:init(args)
 	local volume_lower = function() volume:change_volume({ show_notify = true, down = true }) end
 	local volume_mute  = function() volume:mute() end
 
-	-- screen lock: first available locker wins
-	local lock_screen = function()
-		awful.spawn.easy_async_with_shell(
-			"if command -v i3lock >/dev/null; then i3lock -n -c 14171a;"
-			.. " elif command -v xsecurelock >/dev/null; then xsecurelock;"
-			.. " elif command -v xscreensaver-command >/dev/null; then xscreensaver-command --lock;"
-			.. " else echo NOLOCKER; fi",
-			function(out)
-				if out:find("NOLOCKER") then
-					require("naughty").notify({
-						preset = require("naughty").config.presets.critical,
-						title = "Нечем заблокировать экран",
-						text = "Установи блокировщик: sudo apt install i3lock",
-					})
-				end
-			end
-		)
+	-- media keys drive DeaDBeeF from the command line; stop/next/prev only if it's already running
+	local player_cmd = function(arg)
+		awful.spawn.with_shell("pidof deadbeef >/dev/null && deadbeef " .. arg)
 	end
+
+	-- clipboard manager: CopyQ if installed, otherwise a hint
+	local clipboard_command = "if command -v copyq >/dev/null; then copyq toggle;"
+		.. " else notify-send 'Менеджер буфера обмена' 'Установи CopyQ: sudo apt install copyq'; fi"
 
 	-- Init widgets
 	redflat.float.qlaunch:init()
@@ -627,7 +606,7 @@ function hotkeys:init(args)
 			{ description = "Open a terminal", group = "Actions" }
 		},
 		{
-			{ env.mod, "Mod1" }, "space", function() awful.spawn("gpaste-client ui") end,
+			{ env.mod, "Mod1" }, "space", function() awful.spawn.with_shell(clipboard_command) end,
 			{ description = "Clipboard manager", group = "Actions" }
 		},
 		{
@@ -677,16 +656,8 @@ function hotkeys:init(args)
 			{ description = "Show the top process list", group = "Widgets" }
 		},
 		{
-			{ env.mod, "Control" }, "m", function() redflat.widget.mail:update(true) end,
-			{ description = "Check new mail", group = "Widgets" }
-		},
-		{
 			{ env.mod, "Control" }, "i", function() redflat.widget.minitray:toggle() end,
 			{ description = "Show minitray", group = "Widgets" }
-		},
-		{
-			{ env.mod, "Control" }, "u", function() redflat.widget.updates:update(true) end,
-			{ description = "Check available updates", group = "Widgets" }
 		},
 		{
 			{ env.mod }, "g", function() qlaunch:show() end,
@@ -709,15 +680,6 @@ function hotkeys:init(args)
 			{ env.mod }, "Down", function() awful.layout.inc(-1) end,
 			{ description = "Select previous layout", group = "Layouts" }
 		},
-
---		{
---			{}, "XF86MonBrightnessUp", function() brightness({ step = 2 }) end,
---			{ description = "Increase brightness", group = "Brightness control" }
---		},
---		{
---			{}, "XF86MonBrightnessDown", function() brightness({ step = 2, down = true }) end,
---			{ description = "Reduce brightness", group = "Brightness control" }
---		},
 
 		{
 			{}, "XF86AudioRaiseVolume", volume_raise,
@@ -779,28 +741,24 @@ function hotkeys:init(args)
 			{ description = "Switch titlebar view for all clients", group = "Titlebar" }
 		},
 
---		{
---			{ env.mod }, "e", function() redflat.float.player:show(rb_corner()) end,
---			{ description = "Show/hide widget", group = "Audio player" }
---		},
---		{
---			{}, "XF86AudioPlay", function() redflat.float.player:action("PlayPause") end,
---			{ description = "Play/Pause track", group = "Audio player" }
---		},
---		{
---			{}, "XF86AudioNext", function() redflat.float.player:action("Next") end,
---			{ description = "Next track", group = "Audio player" }
---		},
---		{
---			{}, "XF86AudioPrev", function() redflat.float.player:action("Previous") end,
---			{ description = "Previous track", group = "Audio player" }
---		},
+		{
+			{}, "XF86AudioPlay", function() awful.spawn("deadbeef --play-pause") end,
+			{ description = "Play/Pause (DeaDBeeF)", group = "Audio player" }
+		},
+		{
+			{}, "XF86AudioStop", function() player_cmd("--stop") end,
+			{ description = "Stop", group = "Audio player" }
+		},
+		{
+			{}, "XF86AudioNext", function() player_cmd("--next") end,
+			{ description = "Next track", group = "Audio player" }
+		},
+		{
+			{}, "XF86AudioPrev", function() player_cmd("--prev") end,
+			{ description = "Previous track", group = "Audio player" }
+		},
 
 		-- personal keys
-		{
-			{}, "#179", lock_screen,
-			{ description = "Lock screen", group = "Control" }
-		},
 		{
 			{ env.mod }, "l", function() awful.spawn("systemctl suspend") end,
 			{ description = "Suspend", group = "Control" }

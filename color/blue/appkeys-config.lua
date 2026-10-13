@@ -1,419 +1,154 @@
 -----------------------------------------------------------------------------------------------------------------------
 --                                        Third-party applications keys sheet                                        --
 -----------------------------------------------------------------------------------------------------------------------
--- This file provides table to build hotkeys helpers for third-party applications.
--- The key lists here are purely descriptive, have nothing to do with real application configs.
-
+-- Tables for the per-application hotkeys helper (Mod4+Control+F1 with an app focused).
+-- Key is the lowercase window class. The lists are purely descriptive, they don't change app settings.
 
 local appkeys = {}
 
-appkeys["urxvt"] = {
-	style = { column = 2, geometry = { width = 1200, height = 660 } },
+appkeys["konsole"] = {
+	style = { column = 2, geometry = { width = 1100 } },
 	pack = {
-		{
-			{ "Control" }, "l", nil,
-			{ description = "Clear the screen", group = "Control" }
-		},
-		{
-			{ "Control" }, "s", nil,
-			{ description = "Stops the output to the screen", group = "Control" }
-		},
-		{
-			{ "Control" }, "q", nil,
-			{ description = "Allow output to the screen", group = "Control" }
-		},
-		{
-			{ "Control" }, "c", nil,
-			{ description = "Terminate the command", group = "Control" }
-		},
-		{
-			{ "Control" }, "z", nil,
-			{ description = "Suspend/stop the command", group = "Control" }
-		},
-
-		{
-			{ "Control" }, "a", nil,
-			{ description = "Go to the start of the command line", group = "Editing" }
-		},
-		{
-			{ "Control" }, "e", nil,
-			{ description = "Go to the end of the command line", group = "Editing" }
-		},
-		{
-			{ "Control" }, "k", nil,
-			{ description = "Delete from cursor to the end of the command line", group = "Editing" }
-		},
-		{
-			{ "Control" }, "u", nil,
-			{ description = "Delete from cursor to the start of the command line", group = "Editing" }
-		},
-		{
-			{ "Control" }, "w", nil,
-			{ description = "Delete from cursor to start of word ", group = "Editing" }
-		},
-		{
-			{ "Control" }, "y", nil,
-			{ description = "Paste word or text", group = "Editing" }
-		},
-		{
-			{ "Control" }, "xx", nil,
-			{ description = "Move between start of command line and cursor", group = "Editing" }
-		},
-		{
-			{ "Alt" }, "b", nil,
-			{ description = "Move backward one word", group = "Editing" }
-		},
-		{
-			{ "Alt" }, "f", nil,
-			{ description = "Move forward one word", group = "Editing" }
-		},
-		{
-			{ "Alt" }, "d", nil,
-			{ description = "Delete to end of word starting at cursor", group = "Editing" }
-		},
-		{
-			{ "Alt" }, "c", nil,
-			{ description = "Capitalize to end of word starting at cursor", group = "Editing" }
-		},
-		{
-			{ "Alt" }, "u", nil,
-			{ description = "Make uppercase from cursor to end of word", group = "Editing" }
-		},
-		{
-			{ "Alt" }, "l", nil,
-			{ description = "Make lowercase from cursor to end of word", group = "Editing" }
-		},
-		{
-			{ "Alt" }, "t", nil,
-			{ description = "Swap current word with previous", group = "Editing" }
-		},
-		{
-			{ "Control" }, "f", nil,
-			{ description = "Move forward one character", group = "Editing" }
-		},
-		{
-			{ "Control" }, "b", nil,
-			{ description = "Move backward one character", group = "Editing" }
-		},
-		{
-			{ "Control" }, "d", nil,
-			{ description = "Delete character under the cursor", group = "Editing" }
-		},
-		{
-			{ "Control" }, "h", nil,
-			{ description = "Delete character before the cursor", group = "Editing" }
-		},
-		{
-			{ "Control" }, "t", nil,
-			{ description = "Swap character under cursor with the previous one", group = "Editing" }
-		},
-
-		{
-			{ "Control" }, "r", nil,
-			{ description = "Search the history backwards", group = "Recall" }
-		},
-		{
-			{ "Control" }, "g", nil,
-			{ description = "Escape from history searching mode", group = "Recall" }
-		},
-		{
-			{ "Control" }, "p", nil,
-			{ description = "Previous command in history", group = "Recall" }
-		},
-		{
-			{ "Control" }, "n", nil,
-			{ description = "Next command in history", group = "Recall" }
-		},
-		{
-			{ "Alt" }, ".", nil,
-			{ description = "Use the last word of the previous command", group = "Recall" }
-		},
-
-		{
-			{}, "!!", nil,
-			{ description = "Run last command", group = "Bang" }
-		},
-		{
-			{}, "!blah", nil,
-			{ description = "Run the most recent command that starts with ‘blah’", group = "Bang" }
-		},
-		{
-			{}, "!blah:p", nil,
-			{ description = "Print out the command that !blah would run", group = "Bang" }
-		},
-		{
-			{}, "!$", nil,
-			{ description = "The last word of the previous command", group = "Bang" }
-		},
-		{
-			{}, "!$:p", nil,
-			{ description = "Print out the word that !$ would substitute", group = "Bang" }
-		},
-		{
-			{}, "!*", nil,
-			{ description = "The previous command except for the last word", group = "Bang" }
-		},
-		{
-			{}, "!*:p", nil,
-			{ description = "Print out what !* would substitute", group = "Bang" }
-		},
+		{ { "Control", "Shift" }, "t", nil, { description = "New tab", group = "Tabs" } },
+		{ { "Control", "Shift" }, "w", nil, { description = "Close tab", group = "Tabs" } },
+		{ { "Shift" }, "Right", nil, { description = "Next tab", group = "Tabs" } },
+		{ { "Shift" }, "Left", nil, { description = "Previous tab", group = "Tabs" } },
+		{ { "Control", "Shift" }, "Right", nil, { description = "Move tab right", group = "Tabs" } },
+		{ { "Control", "Shift" }, "Left", nil, { description = "Move tab left", group = "Tabs" } },
+		{ { "Control", "Shift" }, "n", nil, { description = "New window", group = "Window" } },
+		{ { "Control" }, "(", nil, { description = "Split view left/right", group = "Window" } },
+		{ { "Control" }, ")", nil, { description = "Split view top/bottom", group = "Window" } },
+		{ { "Control", "Shift" }, "m", nil, { description = "Show/hide menubar", group = "Window" } },
+		{ { "Control", "Shift" }, "c", nil, { description = "Copy", group = "Edit" } },
+		{ { "Control", "Shift" }, "v", nil, { description = "Paste", group = "Edit" } },
+		{ { "Control", "Shift" }, "f", nil, { description = "Find", group = "Edit" } },
+		{ { "Control" }, "+", nil, { description = "Bigger font", group = "Edit" } },
+		{ { "Control" }, "-", nil, { description = "Smaller font", group = "Edit" } },
+		{ { "Control" }, "c", nil, { description = "Terminate the command", group = "Shell" } },
+		{ { "Control" }, "z", nil, { description = "Suspend the command", group = "Shell" } },
+		{ { "Control" }, "l", nil, { description = "Clear the screen", group = "Shell" } },
+		{ { "Control" }, "r", nil, { description = "Search command history", group = "Shell" } },
+		{ { "Alt" }, ".", nil, { description = "Insert last word of previous command", group = "Shell" } },
+		{ { "Control" }, "a", nil, { description = "Go to line start", group = "Shell" } },
+		{ { "Control" }, "e", nil, { description = "Go to line end", group = "Shell" } },
+		{ { "Control" }, "u", nil, { description = "Delete to line start", group = "Shell" } },
+		{ { "Control" }, "k", nil, { description = "Delete to line end", group = "Shell" } },
+		{ { "Control" }, "w", nil, { description = "Delete previous word", group = "Shell" } },
 	}
 }
 
-
-appkeys["mpv"] = {
-	style = { column = 3, geometry = { width = 1600, height = 720 } },
+appkeys["yakuake"] = {
+	style = { column = 2, geometry = { width = 1100 } },
 	pack = {
-		{
-			{}, "f", nil,
-			{ description = "Toggle fullscreen", group = "General" }
-		},
-		{
-			{}, "s", nil,
-			{ description = "Take a screenshot", group = "General" }
-		},
-		{
-			{ "Shift" }, "s", nil,
-			{ description = "Take a screenshot without subtitles", group = "General" }
-		},
-		{
-			{}, "q", nil,
-			{ description = "Quit", group = "General" }
-		},
-		{
-			{ "Shift" }, "q", nil,
-			{ description = "Quit saving current position", group = "General" }
-		},
-		{
-			{}, "o", nil,
-			{ description = "Show progress", group = "General" }
-		},
-		{
-			{ "Shift" }, "o", nil,
-			{ description = "Toggle show progress", group = "General" }
-		},
-		{
-			{}, "F9", nil,
-			{ description = "Show the list of audio and subtitle", group = "General" }
-		},
-		{
-			{"Shift"}, "a", nil,
-			{ description = "Cycle aspect ratio", group = "General" }
-		},
-
-		{
-			{}, "F8", nil,
-			{ description = "Show the playlist", group = "Playlist" }
-		},
-		{
-			{ "Shift" }, ",", nil,
-			{ description = "Forward in playlist", group = "Playlist" }
-		},
-		{
-			{ "Shift" }, ".", nil,
-			{ description = "Backward in playlist", group = "Playlist" }
-		},
-
-		{
-			{}, "Space", nil,
-			{ description = "Play/pause", group = "Playback" }
-		},
-		{
-			{}, "[", nil,
-			{ description = "Decrease speed", group = "Playback" }
-		},
-		{
-			{}, "]", nil,
-			{ description = "Increase speed", group = "Playback" }
-		},
-		{
-			{}, "{", nil,
-			{ description = "Halve current speed", group = "Playback" }
-		},
-		{
-			{}, "}", nil,
-			{ description = "Double current speed", group = "Playback" }
-		},
-		{
-			{}, "l", nil,
-			{ description = "Set/clear A-B loop points", group = "Playback" }
-		},
-		{
-			{ "Shift" }, "l", nil,
-			{ description = "Toggle infinite looping", group = "Playback" }
-		},
-		{
-			{}, "Backspace", nil,
-			{ description = "Reset speed to normal", group = "Playback" }
-		},
-
-		{
-			{}, "m", nil,
-			{ description = "Mute/unmute", group = "Audio" }
-		},
-		{
-			{}, "9", nil,
-			{ description = "Decrease volume", group = "Audio" }
-		},
-		{
-			{}, "0", nil,
-			{ description = "Increase volume", group = "Audio" }
-		},
-		{
-			{ "Control" }, "-", nil,
-			{ description = "Decrease audio delay", group = "Audio" }
-		},
-		{
-			{ "Control" }, "+", nil,
-			{ description = "Increase audio delay", group = "Audio" }
-		},
-		{
-			{}, "#", nil,
-			{ description = "Cycle through audio tracks", group = "Audio" }
-		},
-
-		{
-			{}, "PageUp", nil,
-			{ description = "Next chapter", group = "Navigation" }
-		},
-		{
-			{}, "PageDn", nil,
-			{ description = "Previous chapter", group = "Navigation" }
-		},
-		{
-			{}, ",", nil,
-			{ description = "Previous frame", group = "Navigation" }
-		},
-		{
-			{}, ".", nil,
-			{ description = "Next frame", group = "Navigation" }
-		},
-		{
-			{}, "Right", nil,
-			{ description = "Forward 5 seconds", group = "Navigation" }
-		},
-		{
-			{}, "Left", nil,
-			{ description = "Backward 5 seconds", group = "Navigation" }
-		},
-		{
-			{}, "Up", nil,
-			{ description = "Forward 60 seconds", group = "Navigation" }
-		},
-		{
-			{}, "Down", nil,
-			{ description = "Backward 60 seconds", group = "Navigation" }
-		},
-		{
-			{ "Control" }, "Left", nil,
-			{ description = "Seek to the previous subtitle", group = "Navigation" }
-		},
-		{
-			{ "Control" }, "Right", nil,
-			{ description = "Seek to the next subtitle", group = "Navigation" }
-		},
-		{
-			{ "Shift" }, "Backspace", nil,
-			{ description = "Undo  the  last  seek", group = "Navigation" }
-		},
-		{
-			{ "Control", "Shift" }, "Backspace", nil,
-			{ description = "Mark the current position", group = "Navigation" }
-		},
-
-		{
-			{}, "v", nil,
-			{ description = "Show/hide subtitles", group = "Subtitles" }
-		},
-		{
-			{}, "j", nil,
-			{ description = "Next subtitle", group = "Subtitles" }
-		},
-		{
-			{ "Shift" }, "j", nil,
-			{ description = "Previous subtitle", group = "Subtitles" }
-		},
-		{
-			{}, "z", nil,
-			{ description = "Increase subtitle delay", group = "Subtitles" }
-		},
-		{
-			{}, "x", nil,
-			{ description = "Decrease subtitle delay", group = "Subtitles" }
-		},
-		{
-			{}, "r", nil,
-			{ description = "Move subtitles up", group = "Subtitles" }
-		},
-		{
-			{}, "t", nil,
-			{ description = "Move subtitles down", group = "Subtitles" }
-		},
-		{
-			{}, "u", nil,
-			{ description = "Style overrides on/off", group = "Subtitles" }
-		},
-
-
-		{
-			{}, "1", nil,
-			{ description = "Decrease contrast", group = "Video" }
-		},
-		{
-			{}, "2", nil,
-			{ description = "Increase contrast", group = "Video" }
-		},
-		{
-			{}, "3", nil,
-			{ description = "Decrease brightness", group = "Video" }
-		},
-		{
-			{}, "4", nil,
-			{ description = "Increase brightness", group = "Video" }
-		},
-		{
-			{}, "5", nil,
-			{ description = "Decrease gamma", group = "Video" }
-		},
-		{
-			{}, "6", nil,
-			{ description = "Increase gamma", group = "Video" }
-		},
-		{
-			{}, "7", nil,
-			{ description = "Decrease saturation", group = "Video" }
-		},
-		{
-			{}, "8", nil,
-			{ description = "Increase saturation", group = "Video" }
-		},
-
-		{
-			{}, "w", nil,
-			{ description = "Decrease pan-and-scan range", group = "Zoom" }
-		},
-		{
-			{}, "e", nil,
-			{ description = "Increase pan-and-scan range", group = "Zoom" }
-		},
-		{
-			{ "Alt" }, "-", nil,
-			{ description = "Decrease zoom", group = "Zoom" }
-		},
-		{
-			{ "Alt" }, "+", nil,
-			{ description = "Increase zoom", group = "Zoom" }
-		},
-		{
-			{ "Alt" }, "Backspace", nil,
-			{ description = "Reset zoom", group = "Zoom" }
-		},
-		{
-			{ "Alt" }, "Arrow", nil,
-			{ description = "Move the video rectangle", group = "Zoom" }
-		},
+		{ {}, "F12", nil, { description = "Open/retract Yakuake", group = "Window" } },
+		{ { "Control", "Shift" }, "t", nil, { description = "New session", group = "Sessions" } },
+		{ { "Control", "Shift" }, "w", nil, { description = "Close session", group = "Sessions" } },
+		{ { "Shift" }, "Right", nil, { description = "Next session", group = "Sessions" } },
+		{ { "Shift" }, "Left", nil, { description = "Previous session", group = "Sessions" } },
+		{ { "Control", "Shift" }, "Right", nil, { description = "Move session right", group = "Sessions" } },
+		{ { "Control", "Shift" }, "Left", nil, { description = "Move session left", group = "Sessions" } },
+		{ { "Control", "Shift" }, "c", nil, { description = "Copy", group = "Edit" } },
+		{ { "Control", "Shift" }, "v", nil, { description = "Paste", group = "Edit" } },
+		{ { "Control" }, "c", nil, { description = "Terminate the command", group = "Shell" } },
+		{ { "Control" }, "z", nil, { description = "Suspend the command", group = "Shell" } },
+		{ { "Control" }, "l", nil, { description = "Clear the screen", group = "Shell" } },
+		{ { "Control" }, "r", nil, { description = "Search command history", group = "Shell" } },
+		{ { "Alt" }, ".", nil, { description = "Insert last word of previous command", group = "Shell" } },
+		{ { "Control" }, "a", nil, { description = "Go to line start", group = "Shell" } },
+		{ { "Control" }, "e", nil, { description = "Go to line end", group = "Shell" } },
+		{ { "Control" }, "u", nil, { description = "Delete to line start", group = "Shell" } },
+		{ { "Control" }, "k", nil, { description = "Delete to line end", group = "Shell" } },
+		{ { "Control" }, "w", nil, { description = "Delete previous word", group = "Shell" } },
 	}
 }
 
+appkeys["krusader"] = {
+	style = { column = 1, geometry = { width = 640 } },
+	pack = {
+		{ {}, "F3", nil, { description = "View file", group = "Files" } },
+		{ {}, "F4", nil, { description = "Edit file", group = "Files" } },
+		{ {}, "F5", nil, { description = "Copy to other panel", group = "Files" } },
+		{ {}, "F6", nil, { description = "Move to other panel", group = "Files" } },
+		{ {}, "F7", nil, { description = "New folder", group = "Files" } },
+		{ {}, "F8", nil, { description = "Delete", group = "Files" } },
+		{ {}, "F10", nil, { description = "Quit", group = "Files" } },
+		{ {}, "Tab", nil, { description = "Switch panel", group = "Panels" } },
+		{ { "Control" }, "u", nil, { description = "Swap panels", group = "Panels" } },
+		{ {}, "Insert", nil, { description = "Select file and move down", group = "Selection" } },
+		{ {}, "Backspace", nil, { description = "Go to parent folder", group = "Navigation" } },
+	}
+}
+
+appkeys["thunderbird"] = {
+	style = { column = 1, geometry = { width = 640 } },
+	pack = {
+		{ {}, "F5", nil, { description = "Get new messages", group = "Mail" } },
+		{ { "Control" }, "n", nil, { description = "Write a message", group = "Mail" } },
+		{ { "Control" }, "r", nil, { description = "Reply", group = "Mail" } },
+		{ { "Control", "Shift" }, "r", nil, { description = "Reply to all", group = "Mail" } },
+		{ { "Control" }, "l", nil, { description = "Forward", group = "Mail" } },
+		{ { "Control" }, "Return", nil, { description = "Send (in compose window)", group = "Mail" } },
+		{ {}, "Delete", nil, { description = "Delete message", group = "Mail" } },
+		{ {}, "m", nil, { description = "Toggle read/unread", group = "Marks" } },
+		{ {}, "s", nil, { description = "Star (flag) message", group = "Marks" } },
+		{ {}, "j", nil, { description = "Mark as junk", group = "Marks" } },
+		{ { "Shift" }, "j", nil, { description = "Mark as not junk", group = "Marks" } },
+		{ {}, "n", nil, { description = "Next unread message", group = "Navigation" } },
+		{ { "Control", "Shift" }, "k", nil, { description = "Quick filter", group = "Search" } },
+		{ { "Control" }, "k", nil, { description = "Search all messages", group = "Search" } },
+	}
+}
+
+appkeys["firefox-esr-esr140"] = {
+	style = { column = 2, geometry = { width = 1100 } },
+	pack = {
+		{ { "Control" }, "t", nil, { description = "New tab", group = "Tabs" } },
+		{ { "Control" }, "w", nil, { description = "Close tab", group = "Tabs" } },
+		{ { "Control", "Shift" }, "t", nil, { description = "Reopen closed tab", group = "Tabs" } },
+		{ { "Control" }, "Tab", nil, { description = "Next tab", group = "Tabs" } },
+		{ { "Control", "Shift" }, "Tab", nil, { description = "Previous tab", group = "Tabs" } },
+		{ { "Control" }, "l", nil, { description = "Focus address bar", group = "Navigation" } },
+		{ { "Alt" }, "Left", nil, { description = "Back", group = "Navigation" } },
+		{ { "Alt" }, "Right", nil, { description = "Forward", group = "Navigation" } },
+		{ {}, "F5", nil, { description = "Reload", group = "Navigation" } },
+		{ { "Control" }, "F5", nil, { description = "Reload without cache", group = "Navigation" } },
+		{ { "Control" }, "f", nil, { description = "Find in page", group = "Page" } },
+		{ { "Control" }, "d", nil, { description = "Bookmark page", group = "Page" } },
+		{ { "Control" }, "+", nil, { description = "Zoom in", group = "Page" } },
+		{ { "Control" }, "-", nil, { description = "Zoom out", group = "Page" } },
+		{ { "Control" }, "0", nil, { description = "Reset zoom", group = "Page" } },
+		{ {}, "F11", nil, { description = "Fullscreen", group = "Window" } },
+		{ {}, "F12", nil, { description = "Developer tools", group = "Window" } },
+		{ { "Control", "Shift" }, "p", nil, { description = "New private window", group = "Window" } },
+	}
+}
+
+appkeys["firefox-esr"] = appkeys["firefox-esr-esr140"]
+
+appkeys["firefox"] = appkeys["firefox-esr-esr140"]
+
+appkeys["brave-browser"] = {
+	style = { column = 2, geometry = { width = 1100 } },
+	pack = {
+		{ { "Control" }, "t", nil, { description = "New tab", group = "Tabs" } },
+		{ { "Control" }, "w", nil, { description = "Close tab", group = "Tabs" } },
+		{ { "Control", "Shift" }, "t", nil, { description = "Reopen closed tab", group = "Tabs" } },
+		{ { "Control" }, "Tab", nil, { description = "Next tab", group = "Tabs" } },
+		{ { "Control", "Shift" }, "Tab", nil, { description = "Previous tab", group = "Tabs" } },
+		{ { "Control" }, "l", nil, { description = "Focus address bar", group = "Navigation" } },
+		{ { "Alt" }, "Left", nil, { description = "Back", group = "Navigation" } },
+		{ { "Alt" }, "Right", nil, { description = "Forward", group = "Navigation" } },
+		{ {}, "F5", nil, { description = "Reload", group = "Navigation" } },
+		{ { "Control" }, "F5", nil, { description = "Reload without cache", group = "Navigation" } },
+		{ { "Control" }, "f", nil, { description = "Find in page", group = "Page" } },
+		{ { "Control" }, "+", nil, { description = "Zoom in", group = "Page" } },
+		{ { "Control" }, "-", nil, { description = "Zoom out", group = "Page" } },
+		{ { "Control" }, "0", nil, { description = "Reset zoom", group = "Page" } },
+		{ {}, "F11", nil, { description = "Fullscreen", group = "Window" } },
+		{ {}, "F12", nil, { description = "Developer tools", group = "Window" } },
+		{ { "Control", "Shift" }, "n", nil, { description = "New private window", group = "Window" } },
+		{ { "Control" }, "h", nil, { description = "History", group = "Window" } },
+	}
+}
 
 return appkeys

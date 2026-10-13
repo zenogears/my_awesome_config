@@ -6,13 +6,13 @@
 local beautiful = require("beautiful")
 --local awful = require("awful")
 local redflat = require("redflat")
+local wibox = require("wibox")
 
 -- Initialize tables and vars for module
 -----------------------------------------------------------------------------------------------------------------------
 local desktop = {}
 
 -- desktop aliases
-local wgeometry = redflat.util.desktop.wgeometry
 local workarea = screen[mouse.screen].workarea
 local system = redflat.system
 local deluge = require("color.blue.deluge-meter")
@@ -26,13 +26,13 @@ function desktop:init(args)
 	local env = args.env or {}
 	local autohide = env.desktop_autohide or false
 
-	-- placement
-	local grid = beautiful.desktop.grid
-	local places = beautiful.desktop.places
+	-- placement: cards stacked in two columns (see theme.desktop.columns / theme.desktop.card)
+	local card = beautiful.desktop.card
+	local cols = beautiful.desktop.columns
 
 	-- Network speed
 	--------------------------------------------------------------------------------
-	local netspeed = { geometry = wgeometry(grid, places.netspeed, workarea) }
+	local netspeed = {}
 
 	netspeed.args = {
 		interface    = "enp3s0",
@@ -46,7 +46,7 @@ function desktop:init(args)
 
 	-- SSD speed
 	--------------------------------------------------------------------------------
-	local ssdspeed = { geometry = wgeometry(grid, places.ssdspeed, workarea) }
+	local ssdspeed = {}
 
 	ssdspeed.args = {
 		interface = "sde4",
@@ -59,7 +59,7 @@ function desktop:init(args)
 
 	-- HDD speed
 	--------------------------------------------------------------------------------
-	local hddspeed = { geometry = wgeometry(grid, places.hddspeed, workarea) }
+	local hddspeed = {}
 
 	hddspeed.args = {
 		interface = "sde3",
@@ -73,7 +73,7 @@ function desktop:init(args)
 	-- CPU and memory usage
 	--------------------------------------------------------------------------------
 	local cpu_storage = { cpu_total = {}, cpu_active = {} }
-	local cpumem = { geometry = wgeometry(grid, places.cpumem, workarea) }
+	local cpumem = {}
 
 	cpumem.args = {
 		topbars = { num = 8, maxm = 100, crit = 90 },
@@ -86,7 +86,7 @@ function desktop:init(args)
 
 	-- Torrents info (deluge)
 	--------------------------------------------------------------------------------
-	local transm = { geometry = wgeometry(grid, places.transm, workarea) }
+	local transm = {}
 
 	transm.args = {
 		topbars    = { num = 8, maxm = 100 },
@@ -99,7 +99,7 @@ function desktop:init(args)
 
 	-- Disks
 	--------------------------------------------------------------------------------
-	local disks = { geometry = wgeometry(grid, places.disks, workarea) }
+	local disks = {}
 
 	disks.args = {
 		sensors  = {
@@ -129,8 +129,8 @@ function desktop:init(args)
 
 	-- Temperature indicator
 	--------------------------------------------------------------------------------
-	local thermal = { geometry = wgeometry(grid, places.thermal, workarea) }
-	local hddtherm = { geometry = wgeometry(grid, places.hddtherm, workarea) }
+	local thermal = {}
+	local hddtherm = {}
 
 	-- hddtemp is setuid on this system, so it works without root
 	local hddtemp = function(disk)
@@ -175,7 +175,32 @@ function desktop:init(args)
 	local desktop_objects = { netspeed, hddspeed, ssdspeed, transm, cpumem, disks, thermal, hddtherm }
 
 	if not autohide then
-		redflat.util.desktop.build.static(desktop_objects)
+		local byname = {
+			netspeed = netspeed, ssdspeed = ssdspeed, hddspeed = hddspeed, cpumem = cpumem,
+			transm = transm, disks = disks, thermal = thermal, hddtherm = hddtherm,
+		}
+		local pad, cw = card.padding, cols.width + 2 * card.padding
+
+		for side, list in pairs({ left = cols.left, right = cols.right }) do
+			local x = workarea.x + (side == "left" and cols.edge.x or workarea.width - cols.edge.x - cw)
+			local y = workarea.y + cols.edge.y
+
+			for _, items in ipairs(list) do
+				local inner = wibox.layout.fixed.vertical()
+				inner.spacing = card.spacing
+				local h = 0
+				for k, item in ipairs(items) do
+					local obj = byname[item[1]]
+					inner:add(wibox.container.constraint(obj.body.area, "exact", cols.width, item[2]))
+					h = h + item[2] + (k > 1 and card.spacing or 0)
+				end
+
+				local box = wibox({ type = "desktop", visible = true, bg = card.bg })
+				box:geometry({ x = x, y = y, width = cw, height = h + 2 * pad })
+				box:set_widget(wibox.container.margin(inner, pad, pad, pad, pad))
+				y = y + h + 2 * pad + cols.gap
+			end
+		end
 	else
 		redflat.util.desktop.build.dynamic(desktop_objects, nil, beautiful.desktopbg, args.buttons)
 	end

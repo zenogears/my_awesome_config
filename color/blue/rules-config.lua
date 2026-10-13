@@ -83,7 +83,8 @@ function rules:init(args)
 
 		-- Personal tag placement
 		{
-			rule_any = { class = { "Navigator", "krusader", "Krusader" } },
+			-- browsers (Firefox ESR, Pale Moon) have instance "Navigator", their class varies by version
+			rule_any = { instance = { "Navigator" }, class = { "firefox", "Firefox", "firefox-esr", "krusader", "Krusader" } },
 			properties = { tag = "Brow" }
 		},
 		{

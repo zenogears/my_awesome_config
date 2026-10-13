@@ -88,10 +88,6 @@ taglist.buttons = awful.util.table.join(
 local textclock = {}
 textclock.widget = redflat.widget.textclock({ timeformat = "%H:%M:%S", dateformat = "%b  %d  %a", timeout = 1 })
 
--- Software update indcator
---------------------------------------------------------------------------------
-redflat.widget.updates:init({ command = env.updates })
-
 -- Layoutbox configure
 --------------------------------------------------------------------------------
 local layoutbox = {}
@@ -137,39 +133,13 @@ kbindicator.buttons = awful.util.table.join(
 	awful.button({}, 5, function () redflat.widget.keyboard:toggle(true)  end)
 )
 
--- Mail widget
---------------------------------------------------------------------------------
--- mail settings template
-local my_mails = require("color.blue.mail-example")
-
--- safe load private mail settings
-pcall(function() my_mails = require("private.mail-config") end)
-
--- widget setup
-local mail = {}
-redflat.widget.mail:init({ maillist = my_mails })
-mail.widget = redflat.widget.mail()
-
--- buttons
-mail.buttons = awful.util.table.join(
-	awful.button({ }, 1, function () awful.spawn.with_shell(env.mail) end),
-	awful.button({ }, 2, function () redflat.widget.mail:update(true) end)
-)
-
 -- System resource monitoring widgets
 --------------------------------------------------------------------------------
 local sysmon = { widget = {}, buttons = {}, icon = {} }
 
 -- icons
-sysmon.icon.battery = redflat.util.table.check(beautiful, "wicon.battery")
 sysmon.icon.network = redflat.util.table.check(beautiful, "wicon.wireless")
 sysmon.icon.cpuram = redflat.util.table.check(beautiful, "wicon.monitor")
-
--- battery
-sysmon.widget.battery = redflat.widget.sysmon(
-	{ func = redflat.system.pformatted.bat(25), arg = "BAT0" },
-	{ timeout = 60, widget = redflat.gauge.icon.single, monitor = { is_vertical = true, icon = sysmon.icon.battery } }
-)
 
 -- network speed
 sysmon.widget.network = redflat.widget.net(
@@ -255,8 +225,6 @@ awful.screen.connect_for_each_screen(
 				layout = wibox.layout.fixed.horizontal,
 
 				separator,
-				-- env.wrapper(mail.widget, "mail", mail.buttons),
-				-- separator,
 				env.wrapper(kbindicator.widget, "keyboard", kbindicator.buttons),
 				separator,
 				env.wrapper(sysmon.widget.network, "network"),
@@ -268,8 +236,6 @@ awful.screen.connect_for_each_screen(
 				env.wrapper(textclock.widget, "textclock"),
 				separator,
 				env.wrapper(tray.widget, "tray", tray.buttons),
-				-- separator,
-				-- env.wrapper(sysmon.widget.battery, "battery"),
 			},
 		}
 	end
@@ -331,3 +297,6 @@ if redflat.startup.is_startup then
 	local autostart = require("color.blue.autostart-config") -- load file with autostart application list
 	autostart.run()
 end
+
+-- Home PC: the screen never blanks or locks (applied on every start/restart, not only on login)
+awful.spawn.with_shell("xset s off -dpms")

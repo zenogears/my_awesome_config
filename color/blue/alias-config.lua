@@ -1,34 +1,54 @@
 -----------------------------------------------------------------------------------------------------------------------
 --                                      Application aliases for tasklist widget                                      --
 -----------------------------------------------------------------------------------------------------------------------
+-- Key is the window class (second WM_CLASS string, see `xprop WM_CLASS`), value is the short tasklist label.
+-- Apps without an alias get the first 5 letters of their class in upper case.
 
 local appnames = {}
 
-appnames["Exaile"              ] = "EXAILE"
-appnames["Pragha"              ] = "PRAG"
-appnames["Smplayer"            ] = "SMPL"
-appnames["Palemoon"            ] = "PAL"
-appnames["Firefox"             ] = "FIFOX"
-appnames["Gnome-terminal"      ] = "GTERM"
-appnames["Gnome-system-monitor"] = "SYSMN"
-appnames["Gthumb"              ] = "THUMB"
-appnames["Gimp-2.8"            ] = "GIMP"
-appnames["Gimp-2.10"           ] = "GIMP"
-appnames["Goldendict"          ] = "GDIC"
-appnames["Easytag"             ] = "ETAG"
-appnames["Mcomix"              ] = "COMIX"
-appnames["Claws-mail"          ] = "CMAIL"
-appnames["Evolution"           ] = "EVOM"
-appnames["URxvt"               ] = "RXVT"
-appnames["VirtualBox"          ] = "VBOX"
-appnames["Keepassx"            ] = "KPASS"
-appnames["keepassxc"           ] = "KPASS"
-appnames["Evince"              ] = "EVINCE"
-appnames["Thunderbird"         ] = "TBIRD"
-appnames["jetbrains-pycharm-ce"] = "PYCRM"
-appnames["jetbrains-clion"     ] = "CLION"
-appnames["Qemu-system-x86_64"  ] = "QEMU"
-appnames["Gpaste-ui"           ] = "PASTE"
+-- browsers
+appnames["firefox-esr-esr140"   ] = "FFOX"
+appnames["firefox-esr"          ] = "FFOX"
+appnames["firefox"              ] = "FFOX"
+appnames["Firefox"              ] = "FFOX"
+appnames["Pale moon"            ] = "PALE"
+appnames["Brave-browser"        ] = "BRAVE"
+
+-- communication
+appnames["thunderbird"          ] = "TBIRD"
+appnames["TelegramDesktop"      ] = "TGRAM"
+appnames["discord"              ] = "DISC"
+appnames["com.anthropic.Claude" ] = "CLAUDE"
+
+-- files and terminals
+appnames["krusader"             ] = "KRUS"
+appnames["dolphin"              ] = "DOLPH"
+appnames["konsole"              ] = "KONS"
+appnames["yakuake"              ] = "YAKU"
+appnames["XTerm"                ] = "XTERM"
+
+-- development
+appnames["jetbrains-pycharm"    ] = "PYCH"
+appnames["jetbrains-pycharm-ce" ] = "PYCH"
+appnames["Code"                 ] = "CODE"
+appnames["Sublime_text"         ] = "SUBL"
+appnames["Godot"                ] = "GODOT"
+appnames["Godot_Engine"         ] = "GODOT"
+appnames["Poedit"               ] = "POED"
+
+-- media and graphics
+appnames["Deadbeef"             ] = "DBEEF"
+appnames["obs"                  ] = "OBS"
+appnames["Gimp"                 ] = "GIMP"
+appnames["Gimp-2.10"            ] = "GIMP"
+appnames["gwenview"             ] = "GWEN"
+appnames["okular"               ] = "OKUL"
+appnames["spectacle"            ] = "SHOT"
+
+-- system
+appnames["Pavucontrol"          ] = "PAVU"
+appnames["pavucontrol"          ] = "PAVU"
+appnames["copyq"                ] = "COPYQ"
+appnames["steam"                ] = "STEAM"
 
 return appnames
-

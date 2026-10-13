@@ -16,14 +16,12 @@ function autostart.run()
 	awful.spawn.with_shell("numlockx on")
 	awful.spawn.with_shell("xxkb")
 	awful.spawn.with_shell("nm-applet")
+	awful.spawn.with_shell("command -v copyq >/dev/null && copyq") -- clipboard manager, if installed
 	-- awful.spawn.with_shell("compton")
 	-- awful.spawn.with_shell("blueman-applet")
 
 	-- keyboard layouts
 	awful.spawn.with_shell("setxkbmap -option -option 'grp:caps_toggle,grp:switch,grp_led:caps,compose:menu' -layout 'us,ru'")
-
-	-- screen power
-	awful.spawn.with_shell("xset -dpms; xset s off")
 
 	-- KDE apps menu cache
 	awful.spawn.with_shell("kbuildsycoca6 --noincremental")

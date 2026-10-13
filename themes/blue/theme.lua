@@ -30,8 +30,8 @@ theme.color.shadow4   = "#727D86"
 theme.color.button    = "#56606A"
 theme.color.pressed   = "#363D44"
 
-theme.color.desktop_gray = "#3A4148"
-theme.color.desktop_icon = "#5E6870"
+theme.color.desktop_gray = "#5C666E"  -- tuned for dark desktop cards
+theme.color.desktop_icon = "#76808A"
 
 
 -- Common
@@ -44,15 +44,26 @@ theme.panel_height = 36 -- panel height
 theme.border_width = 3  -- window border width
 theme.useless_gap  = 6  -- useless gap
 
--- Iosevka Term isn't installed here, use a local monospace for hotkeys helper keys
-theme.fonts.hotkeys.key = "Ubuntu Sans Mono 14"
--- theme.wallpaper    = theme.path .. "/wallpaper/custom.png"
-theme.wallpaper    = "/mnt/oldhome/zen/Изображения/02690-1273271716-girl with pistols.png"
+-- Hotkeys helper fonts: compact enough for two columns on a 1280px wide screen
+-- (Iosevka Term isn't installed here, so keys use a local monospace)
+theme.fonts.hotkeys.main  = "Roboto 12"
+theme.fonts.hotkeys.key   = "Ubuntu Sans Mono 12"
+theme.fonts.hotkeys.title = "Roboto bold 13"
+-- local copy: /mnt/oldhome may be not mounted at login (original: /mnt/oldhome/zen/Изображения/02690-...girl with pistols.png)
+theme.wallpaper    = theme.path .. "/wallpaper/girl-with-pistols.png"
 
 -- Setup parent theme settings
 --------------------------------------------------------------------------------
 theme:update()
 
+
+-- Popups sized for a 1280x1024 screen (upstream values are for 1920+ wide screens)
+theme.float.hotkeys.geometry = { width = 1220 }
+theme.float.hotkeys.heights  = { key = 21, title = 25 }
+theme.float.keychain.keytip  = { geometry = { width = 1100 }, column = 2 }
+theme.float.qlaunch.geometry = { width = 1220, height = 170 }
+theme.service.navigator.keytip["grid"]    = { geometry = { width = 1100 }, column = 2, exit = true }
+theme.service.navigator.keytip["usermap"] = { geometry = { width = 1100 }, column = 2, exit = true }
 
 -- Icons: ACYLS copy recolored to the theme's steel-teal (~/.icons/ACYLS-steel)
 theme.service.dfparser.icons.theme = theme.homedir .. "/.icons/ACYLS-steel"
@@ -63,21 +74,31 @@ theme.service.dfparser.icons.theme = theme.homedir .. "/.icons/ACYLS-steel"
 
 -- Desktop widgets placement
 --------------------------------------------------------------------------------
-theme.desktop.grid = {
-	width  = { 520, 520, 520 },
-	height = { 180, 160, 160, 210, 18, 18 },
-	edge   = { width = { 60, 60 }, height = { 40, 40 } }
+-- Desktop layout tuned for 1280x1024 (see color/blue/desktop-config.lua).
+-- Widgets live on translucent dark "cards" so they read well on any part of the wallpaper.
+-- Two columns: the left one grows from the left edge, the right one from the right edge,
+-- the middle stays free for the wallpaper art. Every card is a list of { widget name, height }.
+theme.desktop.card = {
+	bg      = "#14171Ad8", -- pseudo-transparent, works without a compositor
+	padding = 14,          -- space between card edge and widgets
+	spacing = 10,          -- space between widgets inside one card
 }
 
-theme.desktop.places = {
-	netspeed = { 1, 1 },
-	ssdspeed = { 2, 1 },
-	hddspeed = { 3, 1 },
-	cpumem   = { 1, 2 },
-	transm   = { 1, 3 },
-	disks    = { 1, 4 },
-	thermal  = { 1, 5 },
-	hddtherm = { 1, 6 },
+theme.desktop.columns = {
+	edge  = { x = 24, y = 24 }, -- screen edge to card edge
+	gap   = 14,                 -- space between cards
+	width = 440,                -- widget width (card is wider by 2 * padding)
+	left  = {
+		{ { "cpumem", 150 } },
+		{ { "transm", 150 } },
+		{ { "disks", 196 } },
+		{ { "thermal", 18 }, { "hddtherm", 18 } },
+	},
+	right = {
+		{ { "netspeed", 168 } },
+		{ { "ssdspeed", 168 } },
+		{ { "hddspeed", 168 } },
+	},
 }
 
 -- Desktop widgets
@@ -119,7 +140,7 @@ theme.individual.desktop.multiline.disks = {
 -- Singleline temperature (individual widget)
 theme.individual.desktop.singleline.thermal = {
 	icon  = theme.path .. "/desktop/star.svg",
-	unit  = { { "°C", -1 } },
+	unit  = { { "°", -1 } },
 	lbox  = { draw = "by_width", width = 50, color = "#8A949B" },
 	-- lighter label/value gray so text reads on the dark part of the wallpaper
 	color = { main = theme.color.main, gray = "#8A949B", icon = "#8A949B",
