@@ -83,10 +83,10 @@ function menu:init(args)
 			{ "Places",        placesmenu,  micon("folder_home"), key = "c" },
 			separator,
 			{ "Terminal",      env.terminal, micon("terminal") },
-			{ "PaleMoon",      "palemoon",   micon("palemoon") },
-			{ "Krusader",      "krusader",   micon("folder"), key = "n" },
+			{ "PaleMoon",      "palemoon",   micon("web-browser") },
+			{ "Krusader",      "krusader",   micon("system-file-manager"), key = "n" },
 			{ "Ranger",        ranger_comm,  micon("folder"), key = "r" },
-			{ "PyCharm",       "pycharm-community", micon("PyCharm") },
+			{ "PyCharm",       "pycharm-community", micon("pycharm") },
 			separator,
 			{ "Exit",          exitmenu,     micon("exit") },
 		}

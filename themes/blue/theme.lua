@@ -10,8 +10,28 @@ local theme = require("themes/colored/theme")
 
 -- Color scheme
 -----------------------------------------------------------------------------------------------------------------------
-theme.color.main   = "#064E71"
-theme.color.urgent = "#B32601"
+-- "Steel & crimson": cool steel-teal tuned to the wallpaper, crimson accent from the wing
+theme.color.main      = "#2A7C99"  -- steel teal (active elements)
+theme.color.urgent    = "#C0303A"  -- crimson (urgent / alerts)
+theme.color.gray      = "#56606A"
+theme.color.bg        = "#14171A"
+theme.color.bg_second = "#181C20"
+theme.color.wibox     = "#1D2125"
+theme.color.icon      = "#A6B0B7"
+theme.color.text      = "#B8BFC4"
+theme.color.highlight = "#EBEDEE"
+theme.color.border    = "#363D44"
+
+theme.color.shadow1   = "#121518"
+theme.color.shadow2   = "#2E353B"
+theme.color.shadow3   = "#1A1E22"
+theme.color.shadow4   = "#727D86"
+
+theme.color.button    = "#56606A"
+theme.color.pressed   = "#363D44"
+
+theme.color.desktop_gray = "#3A4148"
+theme.color.desktop_icon = "#5E6870"
 
 
 -- Common
@@ -21,6 +41,11 @@ theme.path = awful.util.get_configuration_dir() .. "themes/blue"
 -- Main config
 --------------------------------------------------------------------------------
 theme.panel_height = 36 -- panel height
+theme.border_width = 3  -- window border width
+theme.useless_gap  = 6  -- useless gap
+
+-- Iosevka Term isn't installed here, use a local monospace for hotkeys helper keys
+theme.fonts.hotkeys.key = "Ubuntu Sans Mono 14"
 -- theme.wallpaper    = theme.path .. "/wallpaper/custom.png"
 theme.wallpaper    = "/mnt/oldhome/zen/Изображения/02690-1273271716-girl with pistols.png"
 
