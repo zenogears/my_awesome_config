@@ -22,8 +22,8 @@ git clone -b <home|work> git@github.com:zenogears/my_awesome_config.git ~/.confi
 ~/.config/awesome/scripts/install-assets.sh   # шрифт Play и иконки ACYLS / ACYLS-steel в $HOME
 ```
 
-Обои не хранятся в репозитории: положи картинку в `themes/blue/wallpaper/girl-with-pistols.png`
-(без неё будет однотонный фон). Сессия awesome выбирается в SDDM на экране входа.
+Обои лежат в `themes/blue/wallpaper/girl-with-pistols.png` (распространяются по лицензии MIT).
+Сессия awesome выбирается в SDDM на экране входа.
 
 Проверка без выхода из сессии: `Xephyr :2 -screen 1920x1080 & DISPLAY=:2 awesome -c ~/.config/awesome/rc-devel.lua`
 (`rc-devel.lua` не запускает автозапуск).

@@ -2,6 +2,7 @@
 
 # Wallpapers
 themes/*/wallpaper/
+!themes/blue/wallpaper/
 
 # Private mail settings
 private/*
