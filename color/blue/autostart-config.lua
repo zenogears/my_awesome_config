@@ -22,7 +22,6 @@ function autostart.run()
 	run("numlockx on")
 	run("xxkb")
 	run("nm-applet")
-	run("copyq") -- clipboard manager
 	-- run("blueman-applet")
 
 	-- keyboard layouts
@@ -38,6 +37,28 @@ function autostart.run()
 	-- run("deadbeef")
 	-- run("palemoon")
 	-- run("deluge")
+end
+
+-- Session services: called on every awesome start and restart (Mod4+Ctrl+r),
+-- each one is started only if it isn't running yet
+--------------------------------------------------------------------------------
+function autostart.services()
+	-- polkit agent, so apps can ask for the admin password (Discover, partition manager, ...)
+	awful.spawn.with_shell(
+		"pgrep -u $USER -x 'polkit-kde-auth|polkit-gnome-au' >/dev/null || for a in"
+		.. " /usr/lib/x86_64-linux-gnu/libexec/polkit-kde-authentication-agent-1"
+		.. " /usr/libexec/polkit-kde-authentication-agent-1"
+		.. " /usr/lib/polkit-kde-authentication-agent-1"
+		.. " /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1"
+		.. " /usr/libexec/polkit-gnome-authentication-agent-1;"
+		.. " do [ -x \"$a\" ] && { \"$a\" & break; }; done"
+	)
+
+	-- CopyQ clipboard manager; also keep text selected with the mouse in its history
+	awful.spawn.with_shell(
+		"command -v copyq >/dev/null && { pgrep -u $USER -x copyq >/dev/null || { copyq & sleep 3; };"
+		.. " copyq config check_selection true >/dev/null; }"
+	)
 end
 
 -- Read and commands from file and spawn them
