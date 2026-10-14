@@ -298,5 +298,8 @@ if redflat.startup.is_startup then
 	autostart.run()
 end
 
+-- Session services (polkit agent, CopyQ): checked on every start/restart, started if missing
+require("color.blue.autostart-config").services()
+
 -- Home PC: the screen never blanks or locks (applied on every start/restart, not only on login)
 awful.spawn.with_shell("xset s off -dpms")
