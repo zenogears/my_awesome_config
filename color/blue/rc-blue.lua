@@ -291,6 +291,15 @@ local signals = require("colorless.signals-config") -- load file with signals co
 signals:init({ env = env })
 
 
+-- Per-application keyboard layout memory
+-----------------------------------------------------------------------------------------------------------------------
+local kbdmemory = require("color.blue.kbd-memory-config") -- load file with keyboard layout memory
+kbdmemory:init({
+	-- fixed start layout for new windows of class (0 - English, 1 - Russian)
+	-- defaults = { ["Alacritty"] = 0, ["TelegramDesktop"] = 1 },
+})
+
+
 -- Autostart user applications
 -----------------------------------------------------------------------------------------------------------------------
 if redflat.startup.is_startup then
